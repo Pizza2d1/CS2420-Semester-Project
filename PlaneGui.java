@@ -14,82 +14,129 @@ public class PlaneGui extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 
-	final int WINDOW_X = 100;
-	final int WINDOW_Y = 100;
-	final int WINDOW_HEIGHT = 1000;
-	final int WINDOW_WIDTH = 800;
+	final static int WINDOW_X = 100;
+	final static int WINDOW_Y = 100;
+	final static int WINDOW_HEIGHT = 1000;
+	final static int WINDOW_WIDTH = 800;
 
 	// Depends on the plane image dimensions
-	final int PLANE_HEIGHT = 1000;
-	final int PLANE_WIDTH = 650;
+	final static int PLANE_HEIGHT = 1000;
+	final static int PLANE_WIDTH = 650;
 	  
-	final int PERSON_WIDTH = 10;
-	final int PERSON_HEIGHT = 10;
-	final int PERSON_SPAWN_X = WINDOW_WIDTH-50;
-	final int PERSON_SPAWN_Y = 50;
+	final static int PERSON_WIDTH = 10;
+	final static int PERSON_HEIGHT = 10;
+	// Spawning in the corner for now
+	final static int PERSON_SPAWN_X = WINDOW_WIDTH-50;
+	final static int PERSON_SPAWN_Y = 50;
 	
 	//static List<Person> peopleArr = new ArrayList<>();
 
 	JLabel planeDisplay = new JLabel();
-	ImageIcon greenPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/green.png"));
-	ImageIcon yellowPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/yellow.png"));
-	ImageIcon redPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/red.png"));
+	static ImageIcon greenPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/green.png"));
+	static ImageIcon yellowPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/yellow.png"));
+	static ImageIcon redPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/red.png"));
 	public static List<Person> peopleArr = new ArrayList<>();
 	
-  	public class Person {
-  		int seatLocation;
-  		JLabel personColor;
-    
-  		Person(int seatLocation, JLabel personColor) {
-  			this.seatLocation = seatLocation;
-  			this.personColor = personColor;
-  		}
-    
-	    public int getX() {
-	      return personColor.getX();
-	    } 
-	    public void setX(int new_x_pos) {
-	    	personColor.setLocation(new_x_pos, getY());
-	    	System.out.println(String.format("New X pos: %d", new_x_pos));
-	    } 
-	    public int getY() {
-		  return personColor.getY();
-		} 
-		public void setY(int new_y_pos) {
-	    	personColor.setLocation(getX(), new_y_pos);
-	    	System.out.println(String.format("New Y pos: %d", new_y_pos));
-		}
-	    public void moveX(int offset) {
-	    	personColor.setLocation(personColor.getX()+offset, personColor.getY());
-	    	System.out.println(String.format("New X pos: %d", personColor.getX()+offset));
-		} 
-	    public void moveY(int offset) {
-	    	personColor.setLocation(personColor.getX(), personColor.getY()+offset);
-	    	System.out.println(String.format("New Y pos: %d", personColor.getY()+offset));
-		} 
-	    public void setColor(ImageIcon newColor) {
-		  this.personColor.setIcon(newColor);
-	    } 
-	    public JLabel getSprite() {
-	      return this.personColor;
-	    } 
-	    public void setSprite(JLabel newSprite) {
-	      this.personColor = newSprite;
-	    } 
 	
-	    // Seated and finished tasks
-	    public void setColorGreen() {
-		  this.personColor.setIcon(greenPerson);
-	    } 
-	    // In the middle of a timed task (such as when storing/retrieving luggage and MAYBE when scouching past someone seated)
-	    public void setColorYellow() {
-		  this.personColor.setIcon(yellowPerson);
-	    }
-	    // Currently waiting to be able to start task (default)
-	    public void setColorRed() {
-	      this.personColor.setIcon(redPerson);
-	    } 
-  	}
+	
+	public record Person(int seatLocation, JLabel personColor) {
+			public int getX() {
+				return personColor.getX();
+			} 
+			public void setX(int new_x_pos) {
+				personColor.setLocation(new_x_pos, getY());
+				System.out.println(String.format("New X pos: %d", new_x_pos));
+			} 
+			public int getY() {
+				return personColor.getY();
+			} 
+			public void setY(int new_y_pos) {
+		    	personColor.setLocation(getX(), new_y_pos);
+		    	System.out.println(String.format("New Y pos: %d", new_y_pos));
+			}
+		    public void moveX(int offset) {
+		    	personColor.setLocation(personColor.getX()+offset, personColor.getY());
+		    	System.out.println(String.format("New X pos: %d", personColor.getX()+offset));
+			} 
+		    public void moveY(int offset) {
+		    	personColor.setLocation(personColor.getX(), personColor.getY()+offset);
+		    	System.out.println(String.format("New Y pos: %d", personColor.getY()+offset));
+			} 
+		    public void setColor(ImageIcon newColor) {
+			  this.personColor.setIcon(newColor);
+		    } 
+		    public JLabel getSprite() {
+		      return this.personColor;
+		    } 
+		
+		    // Seated and finished tasks
+		    public void setColorGreen() {
+			  this.personColor.setIcon(greenPerson);
+		    } 
+		    // In the middle of a timed task (such as when storing/retrieving luggage and MAYBE when scouching past someone seated)
+		    public void setColorYellow() {
+			  this.personColor.setIcon(yellowPerson);
+		    }
+		    // Currently waiting to be able to start task (default)
+		    public void setColorRed() {
+		      this.personColor.setIcon(redPerson);
+		    } 
+	}
+	
+//  	public class Person {
+//  		int seatLocation;
+//  		JLabel personColor;
+//    
+//  		Person(int seatLocation, JLabel personColor) {
+//  			this.seatLocation = seatLocation;
+//  			this.personColor = personColor;
+//  		}
+//    
+//	    public int getX() {
+//	      return personColor.getX();
+//	    } 
+//	    public void setX(int new_x_pos) {
+//	    	personColor.setLocation(new_x_pos, getY());
+//	    	System.out.println(String.format("New X pos: %d", new_x_pos));
+//	    } 
+//	    public int getY() {
+//		  return personColor.getY();
+//		} 
+//		public void setY(int new_y_pos) {
+//	    	personColor.setLocation(getX(), new_y_pos);
+//	    	System.out.println(String.format("New Y pos: %d", new_y_pos));
+//		}
+//	    public void moveX(int offset) {
+//	    	personColor.setLocation(personColor.getX()+offset, personColor.getY());
+//	    	System.out.println(String.format("New X pos: %d", personColor.getX()+offset));
+//		} 
+//	    public void moveY(int offset) {
+//	    	personColor.setLocation(personColor.getX(), personColor.getY()+offset);
+//	    	System.out.println(String.format("New Y pos: %d", personColor.getY()+offset));
+//		} 
+//	    public void setColor(ImageIcon newColor) {
+//		  this.personColor.setIcon(newColor);
+//	    } 
+//	    public JLabel getSprite() {
+//	      return this.personColor;
+//	    } 
+//	    public void setSprite(JLabel newSprite) {
+//	      this.personColor = newSprite;
+//	    } 
+//	
+//	    // Seated and finished tasks
+//	    public void setColorGreen() {
+//		  this.personColor.setIcon(greenPerson);
+//	    } 
+//	    // In the middle of a timed task (such as when storing/retrieving luggage and MAYBE when scouching past someone seated)
+//	    public void setColorYellow() {
+//		  this.personColor.setIcon(yellowPerson);
+//	    }
+//	    // Currently waiting to be able to start task (default)
+//	    public void setColorRed() {
+//	      this.personColor.setIcon(redPerson);
+//	    } 
+//  	}
 
 	public PlaneGui() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
