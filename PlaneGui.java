@@ -1,6 +1,6 @@
 package CS2420_Semester_Project;
 
-import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -19,61 +19,78 @@ public class PlaneGui extends JFrame {
 	final int WINDOW_HEIGHT = 1000;
 	final int WINDOW_WIDTH = 800;
 
+	// Depends on the plane image dimensions
 	final int PLANE_HEIGHT = 1000;
-	final int PLANE_WIDTH = 600;
+	final int PLANE_WIDTH = 650;
 	  
-	final int PERSON_WIDTH = 200;
-	final int PERSON_HEIGHT = 250;
-	final int PERSON_SPAWN_X = WINDOW_X-50;
+	final int PERSON_WIDTH = 10;
+	final int PERSON_HEIGHT = 10;
+	final int PERSON_SPAWN_X = WINDOW_WIDTH-50;
 	final int PERSON_SPAWN_Y = 50;
+	
+	//static List<Person> peopleArr = new ArrayList<>();
 
-	List<Integer> stack;
 	JLabel planeDisplay = new JLabel();
-
+	ImageIcon greenPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/green.png"));
+	ImageIcon yellowPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/yellow.png"));
+	ImageIcon redPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/red.png"));
+	public static List<Person> peopleArr = new ArrayList<>();
+	
   	public class Person {
-  		Color personColor;
-  		int x_pos;
-  		int y_pos;
+  		int seatLocation;
+  		JLabel personColor;
     
-  		Person() {
-  			this.personColor = Color.green;
-  			this.x_pos = PERSON_SPAWN_X;
-  			this.y_pos = PERSON_SPAWN_Y;
+  		Person(int seatLocation, JLabel personColor) {
+  			this.seatLocation = seatLocation;
+  			this.personColor = personColor;
   		}
     
-	    public Color getColor() {
-	      return this.personColor;
-	    } 
-	    public void setColor(Color newColor) {
-	      this.personColor = newColor;
-	    } 
 	    public int getX() {
-	      return this.x_pos;
+	      return personColor.getX();
 	    } 
 	    public void setX(int new_x_pos) {
-	      this.x_pos = new_x_pos;
+	    	personColor.setLocation(new_x_pos, getY());
+	    	System.out.println(String.format("New X pos: %d", new_x_pos));
 	    } 
 	    public int getY() {
-	      return this.y_pos;
+		  return personColor.getY();
+		} 
+		public void setY(int new_y_pos) {
+	    	personColor.setLocation(getX(), new_y_pos);
+	    	System.out.println(String.format("New Y pos: %d", new_y_pos));
+		}
+	    public void moveX(int offset) {
+	    	personColor.setLocation(personColor.getX()+offset, personColor.getY());
+	    	System.out.println(String.format("New X pos: %d", personColor.getX()+offset));
+		} 
+	    public void moveY(int offset) {
+	    	personColor.setLocation(personColor.getX(), personColor.getY()+offset);
+	    	System.out.println(String.format("New Y pos: %d", personColor.getY()+offset));
+		} 
+	    public void setColor(ImageIcon newColor) {
+		  this.personColor.setIcon(newColor);
 	    } 
-	    public void setY(int new_y_pos) {
-	      this.y_pos = new_y_pos;
+	    public JLabel getSprite() {
+	      return this.personColor;
+	    } 
+	    public void setSprite(JLabel newSprite) {
+	      this.personColor = newSprite;
 	    } 
 	
+	    // Seated and finished tasks
 	    public void setColorGreen() {
-	      this.personColor = Color.green;
+		  this.personColor.setIcon(greenPerson);
 	    } 
+	    // In the middle of a timed task (such as when storing/retrieving luggage and MAYBE when scouching past someone seated)
 	    public void setColorYellow() {
-	      this.personColor = Color.yellow;
-	    } 
+		  this.personColor.setIcon(yellowPerson);
+	    }
+	    // Currently waiting to be able to start task (default)
 	    public void setColorRed() {
-	      this.personColor = Color.red;
+	      this.personColor.setIcon(redPerson);
 	    } 
   	}
 
-	/**
-	 * Create the frame.
-	 */
 	public PlaneGui() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -82,7 +99,30 @@ public class PlaneGui extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		planeDisplay.setSize(PLANE_WIDTH, PLANE_HEIGHT);
-		planeDisplay.setIcon(new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/plane_outline-test.png")));
+		planeDisplay.setIcon(new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/plane_outline-test2.png")));
 		contentPane.add(planeDisplay);
+		Person test = createPerson(15);
+		contentPane.add(test.getSprite());
+		//contentPane.add(createPerson(15).getSprite());
+	}
+	
+	public Person createPerson(int seatingNumber) {
+		JLabel personSprite = new JLabel();
+		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
+		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
+		personSprite.setIcon(redPerson);
+		Person test = new Person(seatingNumber, personSprite);
+		peopleArr.add(test);
+		return test;
+	}
+	
+	// For spirtes that need an offset
+	public Person createPerson(int seatingNumber, int x_pos, int y_pos) {
+		JLabel personSprite = new JLabel();
+		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
+		personSprite.setLocation(x_pos, y_pos);
+		personSprite.setIcon(redPerson);
+		Person test = new Person(seatingNumber, personSprite);
+		return test;
 	}
 }
