@@ -1,4 +1,4 @@
-# CS2420-Semester-Project
+# CS2420 Semester Project
 ## Selected project: Plane 
 
 Nathan - Gui and refactoring to work with backend
