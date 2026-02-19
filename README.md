@@ -2,6 +2,7 @@
 ## Selected project: Plane 
 
 Nathan - Gui and refactoring to work with backend
+
 Cory - backend
 
 The plane will have *30* rows with each row containing *3* seats on each side.
