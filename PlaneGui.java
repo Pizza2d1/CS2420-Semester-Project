@@ -12,7 +12,7 @@ import javax.swing.border.EmptyBorder;
 public class PlaneGui extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
+	JPanel contentPane;
 
 	final static int WINDOW_X = 100;
 	final static int WINDOW_Y = 100;
@@ -35,8 +35,7 @@ public class PlaneGui extends JFrame {
 	static ImageIcon greenPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/green.png"));
 	static ImageIcon yellowPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/yellow.png"));
 	static ImageIcon redPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/red.png"));
-	public static List<Person> peopleArr = new ArrayList<>();
-	
+	List<Person> peopleArr = new ArrayList<>();
 	
 	
 	public record Person(int seatLocation, JLabel personColor) {
@@ -148,9 +147,29 @@ public class PlaneGui extends JFrame {
 		planeDisplay.setSize(PLANE_WIDTH, PLANE_HEIGHT);
 		planeDisplay.setIcon(new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/plane_outline-test2.png")));
 		contentPane.add(planeDisplay);
-		Person test = createPerson(15);
-		contentPane.add(test.getSprite());
+		//Person test = createPerson(15);
+		//contentPane.add(test.getSprite());
 		//contentPane.add(createPerson(15).getSprite());
+	}
+	
+	public void addPerson(int seatingNumber) {
+		JLabel personSprite = new JLabel();
+		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
+		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
+		personSprite.setIcon(redPerson);
+		Person test = new Person(seatingNumber, personSprite);
+		peopleArr.add(test);
+		contentPane.add(test.getSprite());
+	}
+	
+	public void addPerson(int seatingNumber, int x_pos, int y_pos) {
+		JLabel personSprite = new JLabel();
+		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
+		personSprite.setLocation(x_pos, y_pos);
+		personSprite.setIcon(redPerson);
+		Person test = new Person(seatingNumber, personSprite);
+		peopleArr.add(test);
+		contentPane.add(test.getSprite());
 	}
 	
 	public Person createPerson(int seatingNumber) {
