@@ -37,6 +37,7 @@ public class CS2420_Semester_Project {
 							}
 						}
 					});
+					// TODO Gonna try and make these person instances a method that can be called
 					frame.addPerson(1); // Person given the value (seatnumber) of 1
 					frame.addPerson(2);
 					frame.addPerson(5);
@@ -46,6 +47,7 @@ public class CS2420_Semester_Project {
 				}
 			}
 		});
+		frame.addPerson(10);
 		
 		// Coding in main should go here
 		// TODO Backend stuff

@@ -39,47 +39,47 @@ public class PlaneGui extends JFrame {
 	
 	
 	public record Person(int seatLocation, JLabel personColor) {
-			public int getX() {
-				return personColor.getX();
-			} 
-			public void setX(int new_x_pos) {
-				personColor.setLocation(new_x_pos, getY());
-				System.out.println(String.format("New X pos: %d", new_x_pos));
-			} 
-			public int getY() {
-				return personColor.getY();
-			} 
-			public void setY(int new_y_pos) {
-		    	personColor.setLocation(getX(), new_y_pos);
-		    	System.out.println(String.format("New Y pos: %d", new_y_pos));
-			}
-		    public void moveX(int offset) {
-		    	personColor.setLocation(personColor.getX()+offset, personColor.getY());
-		    	System.out.println(String.format("New X pos: %d", personColor.getX()+offset));
-			} 
-		    public void moveY(int offset) {
-		    	personColor.setLocation(personColor.getX(), personColor.getY()+offset);
-		    	System.out.println(String.format("New Y pos: %d", personColor.getY()+offset));
-			} 
-		    public void setColor(ImageIcon newColor) {
-			  this.personColor.setIcon(newColor);
-		    } 
-		    public JLabel getSprite() {
-		      return this.personColor;
-		    } 
+		public int getX() {
+			return personColor.getX();
+		} 
+		public void setX(int new_x_pos) {
+			personColor.setLocation(new_x_pos, getY());
+			System.out.println(String.format("New X pos: %d", new_x_pos));
+		} 
+		public int getY() {
+			return personColor.getY();
+		} 
+		public void setY(int new_y_pos) {
+		   	personColor.setLocation(getX(), new_y_pos);
+		   	System.out.println(String.format("New Y pos: %d", new_y_pos));
+		}
+		public void moveX(int offset) {
+		  	personColor.setLocation(personColor.getX()+offset, personColor.getY());
+		  	System.out.println(String.format("New X pos: %d", personColor.getX()+offset));
+		} 
+		public void moveY(int offset) {
+		  	personColor.setLocation(personColor.getX(), personColor.getY()+offset);
+		  	System.out.println(String.format("New Y pos: %d", personColor.getY()+offset));
+		} 
+		public void setColor(ImageIcon newColor) {
+		  this.personColor.setIcon(newColor);
+		} 
+		public JLabel getSprite() {
+		    return this.personColor;
+		} 
 		
-		    // Seated and finished tasks
-		    public void setColorGreen() {
-			  this.personColor.setIcon(greenPerson);
-		    } 
-		    // In the middle of a timed task (such as when storing/retrieving luggage and MAYBE when scouching past someone seated)
-		    public void setColorYellow() {
-			  this.personColor.setIcon(yellowPerson);
-		    }
-		    // Currently waiting to be able to start task (default)
-		    public void setColorRed() {
-		      this.personColor.setIcon(redPerson);
-		    } 
+		  // Seated and finished tasks
+		public void setColorGreen() {
+		  this.personColor.setIcon(greenPerson);
+		} 
+		  // In the middle of a timed task (such as when storing/retrieving luggage and MAYBE when scouching past someone seated)
+		public void setColorYellow() {
+		  this.personColor.setIcon(yellowPerson);
+		}
+		  // Currently waiting to be able to start task (default)
+		public void setColorRed() {
+		    this.personColor.setIcon(redPerson);
+		} 
 	}
 	
 //  	public class Person {

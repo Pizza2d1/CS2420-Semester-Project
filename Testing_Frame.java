@@ -1,7 +1,6 @@
 package CS2420_Semester_Project;
 
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -9,6 +8,11 @@ import javax.swing.JLabel;
 import java.awt.GridLayout;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
+
+
+/*
+ * THIS WILL NOT BE USED IN THE FINAL PROJECT
+ */
 
 public class Testing_Frame extends JFrame {
 
