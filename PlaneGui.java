@@ -12,8 +12,8 @@ import javax.swing.border.EmptyBorder;
 public class PlaneGui extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	JPanel contentPane;
 
+  // Customizable
 	final static int WINDOW_X = 100;
 	final static int WINDOW_Y = 100;
 	final static int WINDOW_HEIGHT = 1000;
@@ -23,6 +23,7 @@ public class PlaneGui extends JFrame {
 	final static int PLANE_HEIGHT = 1000;
 	final static int PLANE_WIDTH = 650;
 	  
+  // Make sure it follows the person png size
 	final static int PERSON_WIDTH = 10;
 	final static int PERSON_HEIGHT = 10;
 	// Spawning in the corner for now
@@ -31,12 +32,13 @@ public class PlaneGui extends JFrame {
 	
 	//static List<Person> peopleArr = new ArrayList<>();
 
+	JPanel contentPane;
 	JLabel planeDisplay = new JLabel();
+	List<Person> peopleArr = new ArrayList<>();
+
 	static ImageIcon greenPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/green.png"));
 	static ImageIcon yellowPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/yellow.png"));
 	static ImageIcon redPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/red.png"));
-	List<Person> peopleArr = new ArrayList<>();
-	
 	
 	public record Person(int seatLocation, JLabel personColor) {
 		public int getX() {

@@ -47,7 +47,6 @@ public class CS2420_Semester_Project {
 				}
 			}
 		});
-		frame.addPerson(10);
 		
 		// Coding in main should go here
 		// TODO Backend stuff
@@ -58,25 +57,29 @@ public class CS2420_Semester_Project {
 	}
 	
 	
-	
 	// Interprets keyboard clicks (For starting and pausing actions)
 	static void action(int keyCode) throws IOException {
 		switch (keyCode) {
+      // KeyEvent.VK_SPACE will check for when the spacebar is pressed and case an event
 			case KeyEvent.VK_SPACE:
 				for (int i = 0; i < peopleArr.size(); i++) {
 					Person testPerson = peopleArr.get(i);
 					Timer timer = new Timer();
-					timer.schedule( new MovementTimer(testPerson), i*CLOCK_SPEED, CLOCK_SPEED);
+					timer.schedule(new MovementTimer(testPerson), i*CLOCK_SPEED, CLOCK_SPEED);
 				}
 				break;
+      // // Example keybind for letter 'e'
+			//case KeyEvent.VK_E:
+      //  RUN ACTION
+			//	break;
 			default:
 				break;
 		}
 	}
 	
+  // Stops the process for a certain amount of time, not recommended for timers
 	public static void sleepy(int milli) {
 		try {
-			// to sleep 10 seconds
 			Thread.sleep(milli);
 		} catch (InterruptedException penis_hehe) {
 			// recommended because catching InterruptedException clears interrupt flag
