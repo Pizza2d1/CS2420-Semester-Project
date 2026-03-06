@@ -62,11 +62,18 @@ public class CS2420_Semester_Project {
 		
 		// Coding in main should go here
 		// TODO Backend stuff
+
+
+
+
+
+
 		
 		
 	}
 	
 
+	// We can shorten this down later, since a lot of this is redundant
 	public static void addPerson(int seatingNumber) {
 		JLabel personSprite = new JLabel();
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
@@ -77,7 +84,7 @@ public class CS2420_Semester_Project {
 		contentPane.add(test.getSprite());
 	}
 
-	public void addPerson(int seatingNumber, int x_pos, int y_pos) {
+	public static void addPerson(int seatingNumber, int x_pos, int y_pos) {
 		JLabel personSprite = new JLabel();
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
 		personSprite.setLocation(x_pos, y_pos);
@@ -87,7 +94,7 @@ public class CS2420_Semester_Project {
 		contentPane.add(test.getSprite());
 	}
 
-	public Person createPerson(int seatingNumber) {
+	public static Person createPerson(int seatingNumber) {
 		JLabel personSprite = new JLabel();
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
@@ -98,7 +105,7 @@ public class CS2420_Semester_Project {
 	}
 
 	// For spirtes that need an offset
-	public Person createPerson(int seatingNumber, int x_pos, int y_pos) {
+	public static Person createPerson(int seatingNumber, int x_pos, int y_pos) {
 		JLabel personSprite = new JLabel();
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
 		personSprite.setLocation(x_pos, y_pos);
