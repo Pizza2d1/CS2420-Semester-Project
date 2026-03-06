@@ -2,7 +2,6 @@ package CS2420_Semester_Project;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -149,9 +148,9 @@ public class PlaneGui extends JFrame {
 		planeDisplay.setSize(PLANE_WIDTH, PLANE_HEIGHT);
 		planeDisplay.setIcon(new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/plane_outline-test2.png")));
 		contentPane.add(planeDisplay);
-		//Person test = createPerson(15);
-		//contentPane.add(test.getSprite());
-		//contentPane.add(createPerson(15).getSprite());
+		// Person test = createPerson(15);
+		// contentPane.add(test.getSprite());
+		// contentPane.add(createPerson(15).getSprite());
 	}
 	
 	public void addPerson(int seatingNumber) {

@@ -1,5 +1,6 @@
 package CS2420_Semester_Project;
 
+import CS2420_Semester_Project.PlaneGui.Person;
 import java.awt.EventQueue;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -7,8 +8,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import CS2420_Semester_Project.PlaneGui.Person;
 
 public class CS2420_Semester_Project {
 	
@@ -18,12 +17,15 @@ public class CS2420_Semester_Project {
 
 	// NOTE: To start the clock you need to press space
 	public static void main(String[] args) {
+
 		
+		System.out.println("balls");
 		// Starts up the gui and keybinds
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				// TODO Clean up my dirty code
 				try {
+
 					PlaneGui frame = new PlaneGui();
 					peopleArr = frame.peopleArr;
 					frame.setVisible(true);
@@ -40,13 +42,17 @@ public class CS2420_Semester_Project {
 					// TODO Gonna try and make these person instances a method that can be called
 					frame.addPerson(1); // Person given the value (seatnumber) of 1
 					frame.addPerson(2);
-					frame.addPerson(5);
+					// frame.addPerson(5);
+
+					
 
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		frame.addPerson(2);
+
 		
 		// Coding in main should go here
 		// TODO Backend stuff
@@ -66,6 +72,27 @@ public class CS2420_Semester_Project {
 					Person testPerson = peopleArr.get(i);
 					Timer timer = new Timer();
 					timer.schedule(new MovementTimer(testPerson), i*CLOCK_SPEED, CLOCK_SPEED);
+				}
+				break;
+			case KeyEvent.VK_W:
+				System.out.println(peopleArr.size());
+				for (int i = 0; i < peopleArr.size(); i++) {
+					peopleArr.get(i).moveY(-15);
+				}
+				break;
+			case KeyEvent.VK_A:
+				for (int i = 0; i < peopleArr.size(); i++) {
+					peopleArr.get(i).moveX(-15);
+				}
+				break;
+			case KeyEvent.VK_S:
+				for (int i = 0; i < peopleArr.size(); i++) {
+					peopleArr.get(i).moveY(15);
+				}
+				break;
+			case KeyEvent.VK_D:
+				for (int i = 0; i < peopleArr.size(); i++) {
+					peopleArr.get(i).moveX(15);
 				}
 				break;
       // // Example keybind for letter 'e'
