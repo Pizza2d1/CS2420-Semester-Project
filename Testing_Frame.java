@@ -10,9 +10,9 @@ import javax.swing.border.LineBorder;
 import java.awt.Color;
 
 
-/*
- * THIS WILL NOT BE USED IN THE FINAL PROJECT
- */
+/*****************************************************************************
+ * THIS WILL NOT BE USED IN THE FINAL PROJECT, DO NOT WORRY ABOUT THIS FILE
+ *****************************************************************************/
 
 public class Testing_Frame extends JFrame {
 
