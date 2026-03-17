@@ -8,6 +8,16 @@ import javax.swing.JLabel;
 * and setters for seatLocation and personColor, clean code
 */
 public record Person(int seatLocation, JLabel personColor) {
+
+  	// Make sure it follows the person png size
+	final static int PERSON_WIDTH = 10;
+	final static int PERSON_HEIGHT = 10;
+	final static int PERSON_STEP_X = 15;
+	final static int PERSON_STEP_Y = 23;
+	// Spawning in the corner for now
+	final static int PERSON_SPAWN_X = PlaneGui.WINDOW_WIDTH-50;
+	final static int PERSON_SPAWN_Y = 50;
+    
     public int getX() {
         return personColor.getX();
     }
