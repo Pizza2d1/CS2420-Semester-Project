@@ -21,7 +21,6 @@ public class CS2420_Semester_Project {
 	static ImageIcon yellowPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/yellow.png"));
 	static ImageIcon redPerson = new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/red.png"));
 
-	
 	static int CLOCK_SPEED = 100;
 	static List<Person> peopleArr = new ArrayList<>();
 	static List<Pair<PersonChecker, Location>> peopleMovementQueue = new ArrayList<>();
@@ -194,48 +193,59 @@ public class CS2420_Semester_Project {
 // Needed to run sim people actions at a constant interval, works as a timer
 class MainClock extends TimerTask {
 	private List<Pair<PersonChecker, Location>> queue;
-	private int CLOCK_SPEED;
+	private List<SnakeTimer> activeTimers = new ArrayList<>();
+	private final int CLOCK_SPEED;
+	
 	MainClock(List<Pair<PersonChecker,Location>> peopleMovementQueue, int CLOCK_SPEED) {
 		this.queue = peopleMovementQueue;
 		this.CLOCK_SPEED = CLOCK_SPEED;
 	}
-	List<SnakeTimer> activeTimers = new ArrayList<>();
+
     public void run() {
 		List<Person> movementCache = new ArrayList<>();
-		for (Pair<PersonChecker, Location> item : queue) {
-			Person person = item.p().person();
-			Timer timer = item.p().timer();
-			Location pointB = item.b();
+		//System.out.println("SIZE " + queue.size());
+		try {
+			for (Pair<PersonChecker, Location> item : queue) {
+				Person person = item.p().person();
+				Timer timer = item.p().timer();
+				Location pointB = item.b();
 			
-			System.out.println(activeTimers.size());
-			for (SnakeTimer activeTimer : activeTimers) {
-				if (activeTimer.getPerson() == person) {
-					// If the movement is done, stop moving and remove from queue
-					if (activeTimer.getFlag() == true) {
-						queue.remove(item);
-						System.out.println("STOPPED TIMER");
-						timer.cancel();
-						timer = null;
-						activeTimers.remove(activeTimer);
-						//continue;
+				System.out.println("SNAKE TIMERS " + activeTimers.size());
+			
+				try {
+					for (SnakeTimer activeTimer : activeTimers) {
+						if (activeTimer.getPerson() == person) {
+							// If the movement is done, stop moving and remove from queue
+							if (activeTimer.getFlag() == true) {
+								queue.remove(item);
+								timer.cancel();
+								//timer = null;
+								System.out.println("STOPPED TIMER");
+								activeTimers.remove(activeTimer);
+							}
+						}
 					}
+				} catch (Exception e) {
+					continue;
 				}
-			}
-			// If multiple move requests, wait until first is done
-			if (movementCache.contains(person)) {
-				System.out.println("PENIS");
-				continue;
-			} else {
-				movementCache.add(person);
-			}
+				// If multiple move requests, wait until first is done
+				if (movementCache.contains(person)) {
+					// System.out.println("PENIS");
+					continue;
+				} else {
+					movementCache.add(person);
+				}
 
-			SnakeTimer timertype = new SnakeTimer(person, pointB.x(), pointB.y());
-			addMovementTimer(person, timer, timertype);
-			activeTimers.add(timertype);
-			System.out.println(activeTimers.size());
+				if (timer == null) continue;
+				SnakeTimer timertype = new SnakeTimer(person, pointB.x(), pointB.y());
+				addMovementTimer(person, timer, timertype);
+				activeTimers.add(timertype);
+			}
+			movementCache = null;
+			System.out.println("Tick");
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
-		movementCache = null;
-		System.out.println("Tick");
 
 
 
