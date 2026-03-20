@@ -123,7 +123,7 @@ public class CS2420_Semester_Project {
 			Runnable task = () -> {
 				long startTime = System.currentTimeMillis();
 				Location targetLocation = new Location(x,y);
-				System.out.println("Person: "+ person.seatLocation + "\n" + targetLocation);
+				// System.out.println("Person: "+ person.seatLocation + "\n" + targetLocation);
 				mainloop:
 				while (true) {
 					if (person.equals(peopleArr.get(0))) break;
@@ -147,7 +147,7 @@ public class CS2420_Semester_Project {
 						} else if (person.getX() > x) {
 							person.moveX(-PERSON_STEP_X);
 						} else {
-							System.out.println("Finished moving");
+							// System.out.println("Finished moving");
 							person.isMoving = false;
 							break;
 						}
@@ -178,7 +178,6 @@ public class CS2420_Semester_Project {
 				}
 				break;
 			case KeyEvent.VK_W:
-				System.out.println(peopleArr.size());
 				for (int i = 0; i < peopleArr.size(); i++) {
 					peopleArr.get(i).moveY(-PERSON_STEP_Y);
 				}
@@ -265,7 +264,7 @@ class MoveInCircleTimer extends TimerTask {
           count = 1;
           break;
       }
-      System.out.println(count);
+      // System.out.println(count);
     }
 }
 
