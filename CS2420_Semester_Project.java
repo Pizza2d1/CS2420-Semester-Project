@@ -5,6 +5,7 @@ import static CS2420_Semester_Project.Person.*;
 import static CS2420_Semester_Project.PlaneGui.*;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -72,10 +73,16 @@ public class CS2420_Semester_Project {
 
 	// We can shorten this down later, since a lot of this is redundant
 	public static void addPerson(int seatingNumber) {
-		JLabel personSprite = new JLabel();
-		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
+
+		JLabel personSprite = new JLabel("•");
+		personSprite.setFont(new Font("Arial", Font.PLAIN, 100)); // Large font for a visible ball
+		// personSprite.setForeground(Color.RED); // Set initial color
+		personSprite.setOpaque(true); // Enable background painting
+		personSprite.setBackground(Color.RED); // Optional: set background to contrast   
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
-		personSprite.setIcon(redPerson);
+		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
+
+		// personSprite.setIcon(redPerson);
 		Person test = new Person(seatingNumber, false, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), personSprite);
 		peopleArr.add(test);
 		contentPane.add(test.getSprite());
