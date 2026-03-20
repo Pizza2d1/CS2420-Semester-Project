@@ -126,6 +126,7 @@ public class CS2420_Semester_Project {
 				System.out.println("Person: "+ person.seatLocation + "\n" + targetLocation);
 				mainloop:
 				while (true) {
+					if (person.equals(peopleArr.get(0))) break;
 					long tempTime = System.currentTimeMillis();
 					for (Person other_people : peopleArr) {
 						if (person.equals(other_people)) continue;
@@ -155,6 +156,7 @@ public class CS2420_Semester_Project {
 				Thread.currentThread().interrupt();
   	  };
 			while (true) { 
+				if (person.equals(peopleArr.get(0))) break;
 				if (!person.isMoving) {
 					person.isMoving = true;
 					startThread(task);
