@@ -1,5 +1,6 @@
 package CS2420_Semester_Project;
 
+import java.awt.Color;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -90,18 +91,25 @@ public class Person {
                     if (reportCollisions)
                         System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
                         this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
-
+                    setColor(Color.YELLOW);
                     flag = true;
                     break;
                 }
             }
             if (!flag) break;
         }
+        setColor(Color.GREEN);
     }
 
 
+    @Deprecated
     public void setColor(ImageIcon newColor) {
         this.personColor.setIcon(newColor);
+    }
+
+    public void setColor(Color newColor) {
+        this.personColor.setBackground(newColor);
+        this.personColor.repaint();;
     }
 
     public JLabel getSprite() {

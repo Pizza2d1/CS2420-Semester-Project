@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 
 public class PlaneGui extends JFrame {
 
+	// For Jframe shenanigans
 	private static final long serialVersionUID = 1L;
 	
 	// Customizable
@@ -25,11 +26,12 @@ public class PlaneGui extends JFrame {
 	final static int PLANE_HEIGHT = 1000;
 	final static int PLANE_WIDTH = 650;
 
+	// REVEVANT TO THE PEOPLE, NOT TO THE GRID DISPLAY
 	final static int PLANE_GRID_1_X = 270;
-	final static int PLANE_GRID_1_Y = 165;
+	final static int PLANE_GRID_1_Y = 188;
 
-	final static int PLANE_GRID_2_X = 375;
-	final static int PLANE_GRID_2_Y = 165;
+	final static int PLANE_GRID_2_X = 345;
+	final static int PLANE_GRID_2_Y = 188;
 	
 	public PlaneGui(List<Person> peopleArr, JLabel planeDisplay, JPanel contentPane) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -41,13 +43,13 @@ public class PlaneGui extends JFrame {
 		planeDisplay.setIcon(new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/plane_outline-test2.png")));
 
 		JPanel GridPanel1 = new JPanel();
-		GridPanel1.setBounds(265, PLANE_GRID_1_Y-12, 50, 700);
+		GridPanel1.setBounds(PLANE_GRID_1_X-5, PLANE_GRID_1_Y-12, 50, 700);
 		GridPanel1.setLayout(new GridLayout(30, 3));
 		for (int i = 0; i < 90; i++) {
 			addGridSeat(GridPanel1);
 		}
 		JPanel GridPanel2 = new JPanel();
-		GridPanel2.setBounds(340, PLANE_GRID_1_Y-12, 50, 700);
+		GridPanel2.setBounds(PLANE_GRID_2_X-5, PLANE_GRID_1_Y-12, 50, 700);
 		GridPanel2.setLayout(new GridLayout(30, 3));
 		for (int i = 0; i < 90; i++) {
 			addGridSeat(GridPanel2);

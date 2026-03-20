@@ -5,11 +5,11 @@ import static CS2420_Semester_Project.Person.*;
 import static CS2420_Semester_Project.PlaneGui.*;
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,8 +27,9 @@ public class CS2420_Semester_Project {
 			CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/red.png"));
 	static Color red = Color.getHSBColor(0, 100, 50);
 
-	static int CLOCK_SPEED = 200;
+	static int CLOCK_SPEED = 100;
 	static List<Person> peopleArr = new ArrayList<>();
+	static Person[] peopleQueue;
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
 
@@ -56,33 +57,33 @@ public class CS2420_Semester_Project {
 			}
 		});
 
-		// Timer timer = new Timer();
-		// timer.schedule(new MainClock(peopleMovementQueue, CLOCK_SPEED), 0,
-		// CLOCK_SPEED);
-
 		// Coding in main should go here
 		// TODO Backend stuff
 
 		// Example adding people with seating numbers
-		addPerson(1); // Person given the value (seatnumber) of 1
-		addPerson(2);
-		addPerson(3);
-		addPerson(4);
+		for (int i = 0; i < 20; i++) {
+			addPerson(i);
+			// Randomize list
+			Collections.shuffle(peopleArr);
+		}
 
 	}
 
 	// We can shorten this down later, since a lot of this is redundant
 	public static void addPerson(int seatingNumber) {
+		// JLabel personSprite = new JLabel("•");
+		// personSprite.setFont(new Font("Arial", Font.PLAIN, 100)); // Large font for a visible ball
+		// // personSprite.setForeground(Color.RED); // Set initial color
+		// personSprite.setOpaque(true); // Enable background painting
+		// personSprite.setBackground(Color.RED); // Optional: set background to contrast   
+		// personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
+		// personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
 
-		JLabel personSprite = new JLabel("•");
-		personSprite.setFont(new Font("Arial", Font.PLAIN, 100)); // Large font for a visible ball
-		// personSprite.setForeground(Color.RED); // Set initial color
+		JLabel personSprite = new JLabel();
 		personSprite.setOpaque(true); // Enable background painting
 		personSprite.setBackground(Color.RED); // Optional: set background to contrast   
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-
-		// personSprite.setIcon(redPerson);
 		Person test = new Person(seatingNumber, false, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), personSprite);
 		peopleArr.add(test);
 		contentPane.add(test.getSprite());
@@ -136,10 +137,7 @@ public class CS2420_Semester_Project {
 	public static void moveToLocation(Person person, int x, int y) {
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
-			// mainloop:
 			while (true) {
-				// if (person.equals(peopleArr.get(0)))
-				// 	break;
 				long tempTime = System.currentTimeMillis();
 				// Choose whether or not to make sure that multiple people are not on the same
 				// space (for people passing over seats)
@@ -184,6 +182,7 @@ public class CS2420_Semester_Project {
 			if (!person.isMoving) {
 				person.isMoving = true;
 				startThread(task);
+				person.setColor(Color.RED);
 				break;
 			}
 		}
@@ -223,13 +222,13 @@ public class CS2420_Semester_Project {
 				break;
 
 			case KeyEvent.VK_U:
-				moveAllToLocation(peopleArr, PLANE_GRID_1_X, PLANE_GRID_1_Y);
+				moveAllToLocation(peopleArr, PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y);
 				break;
 			case KeyEvent.VK_I:
-				moveAllToLocation(peopleArr, PLANE_GRID_2_Y, PLANE_GRID_2_Y);
+				moveAllToLocation(peopleArr, PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y);
 				break;
 			case KeyEvent.VK_O:
-				moveAllToLocation(peopleArr, PLANE_GRID_1_X, PLANE_GRID_1_Y);
+				moveAllToLocation(peopleArr, PLANE_GRID_2_X+PERSON_STEP_X*3, PLANE_GRID_2_Y-PERSON_STEP_Y);
 				break;
 			case KeyEvent.VK_P:
 				moveAllToLocation(peopleArr, PLANE_GRID_1_X, PLANE_GRID_1_Y);
