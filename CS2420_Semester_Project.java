@@ -13,18 +13,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class CS2420_Semester_Project {
 
-	static ImageIcon greenPerson = new ImageIcon(
-			CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/green.png"));
-	static ImageIcon yellowPerson = new ImageIcon(
-			CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/yellow.png"));
-	static ImageIcon redPerson = new ImageIcon(
-			CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/red.png"));
+	// Testing variables
+	static boolean peopleCollision = true;
+
 	static Color red = Color.getHSBColor(0, 100, 50);
 
 	static int CLOCK_SPEED = 100;
@@ -32,9 +28,6 @@ public class CS2420_Semester_Project {
 	static Person[] peopleQueue;
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
-
-	// Testing variables
-	static boolean peopleCollision = true;
 
 	// NOTE: To start the clock you need to press space
 	public static void main(String[] args) {
@@ -84,29 +77,9 @@ public class CS2420_Semester_Project {
 		personSprite.setBackground(Color.RED); // Optional: set background to contrast   
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-		Person test = new Person(seatingNumber, false, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), personSprite);
+		Person test = new Person(seatingNumber, false, personSprite);
 		peopleArr.add(test);
-		contentPane.add(test.getSprite());
-	}
-
-	public static void addPerson(int seatingNumber, ImageIcon color) {
-		JLabel personSprite = new JLabel();
-		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
-		personSprite.setIcon(color);
-		Person test = new Person(seatingNumber, false, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), personSprite);
-		peopleArr.add(test);
-		contentPane.add(test.getSprite());
-	}
-
-	public static void addPerson(int seatingNumber, int x_pos, int y_pos) {
-		JLabel personSprite = new JLabel();
-		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-		personSprite.setLocation(x_pos, y_pos);
-		personSprite.setIcon(redPerson);
-		Person test = new Person(seatingNumber, false, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), personSprite);
-		peopleArr.add(test);
-		contentPane.add(test.getSprite());
+		contentPane.add(test.personSprite);
 	}
 
 	private static void startThread(Runnable task) {
@@ -314,34 +287,4 @@ class MoveInCircleTimer extends TimerTask {
 // this.person = person;
 // this.x = x;
 // this.y = y;
-// }
-
-// @Override
-// public void run() {
-// if (person.getY() < this.y) {
-// this.person.moveY(PERSON_STEP_Y);
-// } else if (person.getY() > this.y) {
-// this.person.moveY(-PERSON_STEP_Y);
-// } else if (person.getX() < this.x) {
-// this.person.moveX(PERSON_STEP_X);
-// } else if (person.getX() > this.x) {
-// this.person.moveX(-PERSON_STEP_X);
-// } else {
-// System.out.println("Big balls");
-// Thread.currentThread().interrupt();
-// }
-// }
-// }
-
-// class Pair<P,B> {
-// private P p;
-// private B b;
-// public Pair(P p, B b){
-// this.p = p;
-// this.b = b;
-// }
-// public P getP(){ return p; }
-// public B getB(){ return b; }
-// public void setP(P p){ this.p = p; }
-// public void setB(B b){ this.b = b; }
 // }

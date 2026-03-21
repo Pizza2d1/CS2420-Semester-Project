@@ -3,12 +3,11 @@ package CS2420_Semester_Project;
 import java.awt.Color;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 /*
 * A record is the same as a class, it just automatically has the getters
-* and setters for personID and personColor, clean code
+* and setters for personID and personSprite, clean code
 */
 public class Person {
 
@@ -27,67 +26,61 @@ public class Person {
 
     public int personID;
     public boolean isMoving;
-    public Location location;
-    public JLabel personColor;
+    public JLabel personSprite;
 
-    public Person(int personID, boolean isMoving, Location location, JLabel personColor) {
+    public Person(int personID, boolean isMoving, JLabel personSprite) {
         this.personID = personID;
         this.isMoving = isMoving;
-        this.location = location;
-        this.personColor = personColor;
+        this.personSprite = personSprite;
     }
     
     public int getX() {
-        return this.location.x;
+        return this.personSprite.getX();
     }
     public void setX(int new_x_pos) {
-        this.location.x = new_x_pos;
+        personSprite.setLocation(new_x_pos, getY());
         // System.out.println(String.format("New X pos: %d", new_x_pos));
     }
 
     public int getY() {
-        return this.location.y;
+        return this.personSprite.getY();
     }
     public void setY(int new_y_pos) {
-        this.location.y = new_y_pos;
+        personSprite.setLocation(getX(), new_y_pos);
         // System.out.println(String.format("New Y pos: %d", new_y_pos));
     }
 
     public void moveX(int offset) {
-        setX(this.location.x + offset);
-        updateSprite();
+        setX(this.personSprite.getX() + offset);
         if (reportMovement) System.out.println(String.format("New X pos: %d", getX()));
     }
 
     public void moveY(int offset) {
-        setY(this.location.y + offset);
-        updateSprite();
+        setY(this.personSprite.getY() + offset);
         if (reportMovement) System.out.println(String.format("New Y pos: %d", getY()));
     }
 
     // Collision checking movements
     public void moveX(int offset, List<Person> peopleArr) {
-        checkForCollision(peopleArr, new Location(getX() + offset, getY()));
-        setX(this.location.x + offset);
-        updateSprite();
+        checkForCollision(peopleArr, getX() + offset, getY());
+        setX(this.personSprite.getX() + offset);
         if (reportMovement) System.out.println(String.format("New X pos: %d", getX()));
     }
 
     public void moveY(int offset, List<Person> peopleArr) {
-        checkForCollision(peopleArr, new Location(getX(), getY() + offset));
-        setY(this.location.y + offset);
-        updateSprite();
+        checkForCollision(peopleArr, getX(), getY() + offset);
+        setY(this.personSprite.getY() + offset);
         if (reportMovement) System.out.println(String.format("New Y pos: %d", getY()));
     }
 
     // Will make the person wait for a open space to move
-    private void checkForCollision(List<Person> peopleArr, Location targetLocation) {
+    private void checkForCollision(List<Person> peopleArr, int target_x, int target_y) {
         boolean flag = true;
         while (true) {
             flag = false;
             for (Person other_person : peopleArr) {
                 if (this.equals(other_person)) break;
-                if (targetLocation.equals(other_person.location)) {
+                if (target_x == other_person.getX() && target_y == other_person.getY()) {
                     if (reportCollisions)
                         System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
                         this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
@@ -101,78 +94,38 @@ public class Person {
         setColor(Color.GREEN);
     }
 
-
-    @Deprecated
-    public void setColor(ImageIcon newColor) {
-        this.personColor.setIcon(newColor);
-    }
-
     public void setColor(Color newColor) {
-        this.personColor.setBackground(newColor);
-        this.personColor.repaint();;
-    }
-
-    public JLabel getSprite() {
-        return this.personColor;
-    }
-
-    public void updateSprite() {
-        personColor.setLocation(getX(), getY());
-    }
-
-    // Seated and finished tasks
-    public void setColorGreen() {
-        this.personColor.setIcon(CS2420_Semester_Project.greenPerson);
-    }
-
-    // In the middle of a timed task (such as when storing/retrieving luggage and MAYBE when scouching past someone seated)
-    public void setColorYellow() {
-        this.personColor.setIcon(CS2420_Semester_Project.yellowPerson);
-    }
-
-    // Currently waiting to be able to start task (default)
-    public void setColorRed() {
-        this.personColor.setIcon(CS2420_Semester_Project.redPerson);
-    }
-
-    public boolean hasSameLocation(Location other) {
-        if (this.location == other)
-            return true;
-        if (other == null
-            || this.location.getClass() != other.getClass())
-            return false;
-        Location p1 = (Location)other;
-        return this.location.x == p1.x
-            && this.location.y == p1.y;
+        this.personSprite.setBackground(newColor);
+        this.personSprite.repaint();;
     }
 }
 
-// Couldn't use java record because they are immutable, big sad
-class Location {
-   	public int x;
-   	public int y;
-	public Location(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
+// // Couldn't use java record because they are immutable, big sad
+// class Location {
+//    	public int x;
+//    	public int y;
+// 	public Location(int x, int y) {
+// 		this.x = x;
+// 		this.y = y;
+// 	}
     
-    @Override
-    public String toString() {
-      return "X: " + x + " Y: " + y;
-    }
+//     @Override
+//     public String toString() {
+//       return "X: " + x + " Y: " + y;
+//     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
+//     // @Override
+//     // public boolean equals(Object obj) {
+//     //     if (this == obj)
+//     //         return true;
 
-        if (obj == null
-            || this.getClass() != obj.getClass())
-            return false;
+//     //     if (obj == null
+//     //         || this.getClass() != obj.getClass())
+//     //         return false;
 
-        Location p1 = (Location)obj;
+//     //     Location p1 = (Location)obj;
 
-        return this.x == p1.x
-            && this.y == p1.y;
-    }
-}
+//     //     return this.x == p1.x
+//     //         && this.y == p1.y;
+//     // }
+// }
