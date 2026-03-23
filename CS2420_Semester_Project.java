@@ -23,9 +23,8 @@ public class CS2420_Semester_Project {
 
 	static Color red = Color.getHSBColor(0, 100, 50);
 
-	static int CLOCK_SPEED = 100;
+	static int CLOCK_SPEED = 1000;
 	static List<Person> peopleArr = new ArrayList<>();
-	static Person[] peopleQueue;
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
 
@@ -34,10 +33,10 @@ public class CS2420_Semester_Project {
 		// Starts up the gui and keybinds
 		EventQueue.invokeLater(() -> {
 			try {
-				PlaneGui frame = new PlaneGui(peopleArr, planeDisplay, contentPane); // Can prob make this section
-																						// shorter, but whatever
+				PlaneGui frame = new PlaneGui(peopleArr, planeDisplay, contentPane); // Can prob make this section shorter, but whatever
 				frame.setVisible(true);
 				frame.addKeyListener(new KeyAdapter() {
+          @Override
 					public void keyPressed(KeyEvent e) {
 						int keyCode = e.getKeyCode();
 						try { // Two try/catch statements? Ewwww
@@ -63,7 +62,7 @@ public class CS2420_Semester_Project {
 	}
 
 	// We can shorten this down later, since a lot of this is redundant
-	public static void addPerson(int seatingNumber) {
+	private static void addPerson(int seatingNumber) {
 		// JLabel personSprite = new JLabel("•");
 		// personSprite.setFont(new Font("Arial", Font.PLAIN, 100)); // Large font for a visible ball
 		// // personSprite.setForeground(Color.RED); // Set initial color
@@ -74,30 +73,24 @@ public class CS2420_Semester_Project {
 
 		JLabel personSprite = new JLabel();
 		personSprite.setOpaque(true); // Enable background painting
-		personSprite.setBackground(Color.RED); // Optional: set background to contrast   
+		personSprite.setBackground(red); // Optional: set background to contrast   
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-		Person test = new Person(seatingNumber, false, personSprite);
+		Person test = new Person(seatingNumber, false, personSprite, new ArrayList<>());
 		peopleArr.add(test);
 		contentPane.add(test.personSprite);
 	}
 
-	private static void startThread(Runnable task) {
-		Thread thread = new Thread(task);
-		thread.start(); // This creates a new thread and calls run() in it
-	}
-
-	public static void moveAllToLocation(List<Person> people, int x, int y) {
+	private static void moveAllToLocation(List<Person> people, Location targetLocation) {
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
 			int personCount = 0;
 			while (true) {
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > CLOCK_SPEED) {
-					if (personCount == people.size()) {
+					if (personCount == people.size())
 						break;
-					}
-					moveToLocation(people.get(personCount), x, y);
+					moveToLocation_YPriority(people.get(personCount), targetLocation);
 					startTime = System.currentTimeMillis();
 					personCount++;
 				}
@@ -107,51 +100,31 @@ public class CS2420_Semester_Project {
 		startThread(task);
 	}
 
-	public static void moveToLocation(Person person, int x, int y) {
+	private static void moveToLocation_YPriority(Person person, Location targetLocation) {
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
 			while (true) {
 				long tempTime = System.currentTimeMillis();
-				// Choose whether or not to make sure that multiple people are not on the same
-				// space (for people passing over seats)
 				if (tempTime - startTime > CLOCK_SPEED) {
 					startTime = System.currentTimeMillis();
-					if (peopleCollision) {
-						if (person.getY() < y) {
-							person.moveY(PERSON_STEP_Y, peopleArr);
-						} else if (person.getY() > y) {
-							person.moveY(-PERSON_STEP_Y, peopleArr);
-						} else if (person.getX() < x) {
-							person.moveX(PERSON_STEP_X, peopleArr);
-						} else if (person.getX() > x) {
-							person.moveX(-PERSON_STEP_X, peopleArr);
-						} else {
-							// System.out.println("Finished moving");
-							person.isMoving = false;
-							break;
-						}
+					if (person.getY() < targetLocation.y()) {
+						person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
+					} else if (person.getY() > targetLocation.y()) {
+						person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
+					} else if (person.getX() < targetLocation.x()) {
+						person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
+					} else if (person.getX() > targetLocation.x()) {
+						person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
 					} else {
-						if (person.getY() < y) {
-							person.moveY(PERSON_STEP_Y);
-						} else if (person.getY() > y) {
-							person.moveY(-PERSON_STEP_Y);
-						} else if (person.getX() < x) {
-							person.moveX(PERSON_STEP_X);
-						} else if (person.getX() > x) {
-							person.moveX(-PERSON_STEP_X);
-						} else {
-							// System.out.println("Finished moving");
-							person.isMoving = false;
-							break;
-						}
+						person.isMoving = false;
+						break;
 					}
+					
 				}
 			}
 			Thread.currentThread().interrupt();
 		};
 		while (true) {
-			// if (person.equals(peopleArr.get(0)))
-			// 	break;
 			if (!person.isMoving) {
 				person.isMoving = true;
 				startThread(task);
@@ -159,6 +132,50 @@ public class CS2420_Semester_Project {
 				break;
 			}
 		}
+	}
+
+	private static void queueMovementToLocation(Person person, Location targetLocation) {
+		Runnable task = () -> {
+			while (!person.moveToLocationQueue.isEmpty()) {
+				moveToLocationQueuedVertical(person);
+			}
+			Thread.currentThread().interrupt();
+		};
+
+		person.moveToLocationQueue.add(targetLocation);
+		if (!person.isMoving) {
+			person.isMoving = true;
+			startThread(task);
+		}
+	}
+
+	// Prioritizes Vertical (up and down) movement over Horizontal
+	private static void moveToLocationQueuedVertical(Person person) {
+		Location targetLocation = person.moveToLocationQueue.getFirst();
+		System.out.println("Started moving to " + targetLocation);
+		long startTime = System.currentTimeMillis();
+		while (true) {
+			long tempTime = System.currentTimeMillis();
+			if (tempTime - startTime > CLOCK_SPEED) {
+				startTime = System.currentTimeMillis();
+				if (person.getY() < targetLocation.y()) {
+					person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
+				} else if (person.getY() > targetLocation.y()) {
+					person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
+				} else if (person.getX() < targetLocation.x()) {
+					person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
+				} else if (person.getX() > targetLocation.x()) {
+					person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
+				} else {
+					person.isMoving = false;
+					break;
+				}
+				
+			}
+		}
+		person.setColor(Color.RED);
+		person.moveToLocationQueue.removeFirst();
+		System.out.println("Finished moving");
 	}
 
 	// Interprets keyboard clicks (For starting and pausing actions)
@@ -194,17 +211,26 @@ public class CS2420_Semester_Project {
 				}
 				break;
 
+			case KeyEvent.VK_K:
+				queueMovementToLocation(peopleArr.get(0), new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
+				queueMovementToLocation(peopleArr.get(0), new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				break;
+			case KeyEvent.VK_J:
+				queueMovementToLocation(peopleArr.get(1), new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
+				queueMovementToLocation(peopleArr.get(1), new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				break;
+
 			case KeyEvent.VK_U:
-				moveAllToLocation(peopleArr, PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y);
+				moveAllToLocation(peopleArr, new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_I:
-				moveAllToLocation(peopleArr, PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y);
+				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_O:
-				moveAllToLocation(peopleArr, PLANE_GRID_2_X+PERSON_STEP_X*3, PLANE_GRID_2_Y-PERSON_STEP_Y);
+				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X+PERSON_STEP_X*3, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_P:
-				moveAllToLocation(peopleArr, PLANE_GRID_1_X, PLANE_GRID_1_Y);
+				moveAllToLocation(peopleArr, new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y));
 				break;
 
 			case KeyEvent.VK_Q:
@@ -220,21 +246,23 @@ public class CS2420_Semester_Project {
 	}
 
 	// Stops the process for a certain amount of time, not recommended for timers
-	// Dont use this, it is a bad method
+	// Dont use this, it is a bad method, I use it as a reminder
 	public static void sleepy(int milli) {
 		try {
 			Thread.sleep(milli);
 		} catch (InterruptedException penis_hehe) {
-			// recommended because catching InterruptedException clears interrupt flag
 			Thread.currentThread().interrupt();
-			// you probably want to quit if the thread is interrupted
-			return;
 		}
+	}
+
+	private static void startThread(Runnable task) {
+		Thread thread = new Thread(task);
+		thread.start();
 	}
 }
 
 class MoveInCircleTimer extends TimerTask {
-	private Person person;
+	private final Person person;
 
 	MoveInCircleTimer(Person person) {
 		this.person = person;

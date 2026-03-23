@@ -12,8 +12,8 @@ import javax.swing.JLabel;
 public class Person {
 
     // Testing variables
-    private static boolean reportMovement = false;
-    private static boolean reportCollisions = false;
+    private static final boolean REPORT_MOVEMENT = false;
+    private static final boolean REPORT_COLLISIONS = false;
 
     // Make sure it follows the person png size
     public static final int PERSON_WIDTH = 10;
@@ -27,11 +27,13 @@ public class Person {
     public int personID;
     public boolean isMoving;
     public JLabel personSprite;
+    public List<Location> moveToLocationQueue;
 
-    public Person(int personID, boolean isMoving, JLabel personSprite) {
+    public Person(int personID, boolean isMoving, JLabel personSprite, List<Location> moveToLocationQueue) {
         this.personID = personID;
         this.isMoving = isMoving;
         this.personSprite = personSprite;
+        this.moveToLocationQueue = moveToLocationQueue;
     }
     
     public int getX() {
@@ -52,53 +54,106 @@ public class Person {
 
     public void moveX(int offset) {
         setX(this.personSprite.getX() + offset);
-        if (reportMovement) System.out.println(String.format("New X pos: %d", getX()));
+        if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", getX()));
     }
 
     public void moveY(int offset) {
         setY(this.personSprite.getY() + offset);
-        if (reportMovement) System.out.println(String.format("New Y pos: %d", getY()));
+        if (REPORT_MOVEMENT) System.out.println(String.format("New Y pos: %d", getY()));
     }
 
     // Collision checking movements
-    public void moveX(int offset, List<Person> peopleArr) {
-        checkForCollision(peopleArr, getX() + offset, getY());
+    public void moveX(int offset, List<Person> peopleArr, boolean peopleCollision) {
+        if (peopleCollision) {
+            lockMovementForCollision(peopleArr, getX() + offset, getY());
+        }
         setX(this.personSprite.getX() + offset);
-        if (reportMovement) System.out.println(String.format("New X pos: %d", getX()));
+        if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", getX()));
     }
 
-    public void moveY(int offset, List<Person> peopleArr) {
-        checkForCollision(peopleArr, getX(), getY() + offset);
+    public void moveY(int offset, List<Person> peopleArr, boolean peopleCollision) {
+        if (peopleCollision) {
+            lockMovementForCollision(peopleArr, getX(), getY() + offset);
+        }
         setY(this.personSprite.getY() + offset);
-        if (reportMovement) System.out.println(String.format("New Y pos: %d", getY()));
+        if (REPORT_MOVEMENT) System.out.println(String.format("New Y pos: %d", getY()));
     }
 
     // Will make the person wait for a open space to move
-    private void checkForCollision(List<Person> peopleArr, int target_x, int target_y) {
-        boolean flag = true;
+    private void lockMovementForCollision(List<Person> peopleArr, int target_x, int target_y) {
         while (true) {
-            flag = false;
-            for (Person other_person : peopleArr) {
-                if (this.equals(other_person)) break;
-                if (target_x == other_person.getX() && target_y == other_person.getY()) {
-                    if (reportCollisions)
-                        System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
-                        this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
-                    setColor(Color.YELLOW);
-                    flag = true;
-                    break;
-                }
-            }
-            if (!flag) break;
+            if (!checkForCollision(peopleArr, target_x, target_y)) break;
         }
         setColor(Color.GREEN);
     }
+
+    private boolean checkForCollision(List<Person> peopleArr, int target_x, int target_y) {
+        for (Person other_person : peopleArr) {
+            if (this.equals(other_person)) break;
+            if (target_x == other_person.getX() && target_y == other_person.getY()) {
+                if (REPORT_COLLISIONS)
+                    System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
+                    this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
+                setColor(Color.YELLOW);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*
+    * Ugly nested code, if you get further than 4 tabs, then split it into functions like above
+    */
+    // private void checkForCollision(List<Person> peopleArr, int target_x, int target_y) {
+    //     boolean flag;
+    //     while (true) {
+    //         flag = false;
+    //         for (Person other_person : peopleArr) {
+    //             if (this.equals(other_person)) break;
+    //             if (target_x == other_person.getX() && target_y == other_person.getY()) {
+    //                 if (REPORT_COLLISIONS)
+    //                     System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
+    //                     this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
+    //                 setColor(Color.YELLOW);
+    //                 flag = true;
+    //                 break;
+    //             }
+    //         }
+    //         if (!flag) break;
+    //     }
+    //     setColor(Color.GREEN);
+    // }
 
     public void setColor(Color newColor) {
         this.personSprite.setBackground(newColor);
         this.personSprite.repaint();;
     }
 }
+
+
+record Location(int x, int y) {
+    @Override
+    public String toString() {
+      return "X: " + x + " Y: " + y;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        if (obj == null
+            || this.getClass() != obj.getClass())
+            return false;
+
+        Location p1 = (Location)obj;
+
+        return this.x == p1.x
+            && this.y == p1.y;
+    }
+};
+
+
 
 // // Couldn't use java record because they are immutable, big sad
 // class Location {
@@ -114,18 +169,18 @@ public class Person {
 //       return "X: " + x + " Y: " + y;
 //     }
 
-//     // @Override
-//     // public boolean equals(Object obj) {
-//     //     if (this == obj)
-//     //         return true;
+//     @Override
+//     public boolean equals(Object obj) {
+//         if (this == obj)
+//             return true;
 
-//     //     if (obj == null
-//     //         || this.getClass() != obj.getClass())
-//     //         return false;
+//         if (obj == null
+//             || this.getClass() != obj.getClass())
+//             return false;
 
-//     //     Location p1 = (Location)obj;
+//         Location p1 = (Location)obj;
 
-//     //     return this.x == p1.x
-//     //         && this.y == p1.y;
-//     // }
+//         return this.x == p1.x
+//             && this.y == p1.y;
+//     }
 // }
