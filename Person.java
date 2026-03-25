@@ -95,10 +95,10 @@ public class Person {
                     System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
                     this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
                 setColor(Color.YELLOW);
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     /*

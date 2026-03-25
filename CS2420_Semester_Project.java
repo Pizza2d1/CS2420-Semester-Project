@@ -5,6 +5,7 @@ import static CS2420_Semester_Project.Person.*;
 import static CS2420_Semester_Project.PlaneGui.*;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -71,7 +72,9 @@ public class CS2420_Semester_Project {
 		// personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		// personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
 
-		JLabel personSprite = new JLabel();
+		JLabel personSprite = new JLabel(String.valueOf(seatingNumber));
+		// System.out.println(personSprite.getFont().getSize());
+		personSprite.setFont(new Font("Arial", Font.PLAIN, 8)); // Large font for a visible ball
 		personSprite.setOpaque(true); // Enable background painting
 		personSprite.setBackground(red); // Optional: set background to contrast   
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
@@ -99,6 +102,22 @@ public class CS2420_Semester_Project {
 		};
 		startThread(task);
 	}
+
+	
+	private static void makeLoggerClock() {
+		Runnable task = () -> {
+			long startTime = System.currentTimeMillis();
+			while (true) {
+				long tempTime = System.currentTimeMillis();
+				if (tempTime - startTime > CLOCK_SPEED) {
+					startTime = System.currentTimeMillis();
+
+				}
+			}
+		};
+		startThread(task);
+	}
+
 
 	private static void moveToLocation_YPriority(Person person, Location targetLocation) {
 		Runnable task = () -> {
@@ -211,6 +230,13 @@ public class CS2420_Semester_Project {
 				}
 				break;
 
+			case KeyEvent.VK_COMMA:
+				CLOCK_SPEED-=100;
+				break;
+			case KeyEvent.VK_PERIOD:
+				CLOCK_SPEED+=100;
+				break;
+
 			case KeyEvent.VK_K:
 				queueMovementToLocation(peopleArr.get(0), new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
 				queueMovementToLocation(peopleArr.get(0), new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
@@ -259,6 +285,30 @@ public class CS2420_Semester_Project {
 		Thread thread = new Thread(task);
 		thread.start();
 	}
+
+	// private void immediateTimer(int clockSpeed, Runnnable methodToRun) {
+
+	// 	long startTime = System.currentTimeMillis();
+	// 	while (true) {
+	// 		long tempTime = System.currentTimeMillis();
+	// 		if (tempTime - startTime > CLOCK_SPEED) {
+	// 			startTime = System.currentTimeMillis();
+	// 			if (person.getY() < targetLocation.y()) {
+	// 				person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
+	// 			} else if (person.getY() > targetLocation.y()) {
+	// 				person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
+	// 			} else if (person.getX() < targetLocation.x()) {
+	// 				person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
+	// 			} else if (person.getX() > targetLocation.x()) {
+	// 				person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
+	// 			} else {
+	// 				person.isMoving = false;
+	// 				break;
+	// 			}
+				
+	// 		}
+	// 	}
+	// }
 }
 
 class MoveInCircleTimer extends TimerTask {
