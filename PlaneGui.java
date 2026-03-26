@@ -32,7 +32,7 @@ public class PlaneGui extends JFrame {
 
 	final static int PLANE_GRID_2_X = 345;
 	final static int PLANE_GRID_2_Y = 188;
-	
+
 	public PlaneGui(List<Person> peopleArr, JLabel planeDisplay, JPanel contentPane) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(WINDOW_X, WINDOW_Y, WINDOW_WIDTH, WINDOW_HEIGHT);

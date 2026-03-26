@@ -10,10 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -24,7 +21,7 @@ public class CS2420_Semester_Project {
 
 	static Color red = Color.getHSBColor(0, 100, 50);
 
-	static int CLOCK_SPEED = 1000;
+	static int CLOCK_SPEED = 100;
 	static List<Person> peopleArr = new ArrayList<>();
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
@@ -54,29 +51,24 @@ public class CS2420_Semester_Project {
 		// TODO Backend stuff
 
 		// Example adding people with seating numbers
-		for (int i = 0; i < 20; i++) {
+		for (int i = 1; i <= 20; i++) {
 			addPerson(i);
 			// Randomize list
-			Collections.shuffle(peopleArr);
+			// Collections.shuffle(peopleArr);
 		}
 
+		for (Person person : peopleArr) {
+			System.out.println("PERSON ID: " + person.personID);
+			System.out.println("SEAT X: " + person.getSeatX());
+			System.out.println("SEAT Y: " + person.getSeatY());
+		}
 	}
 
-	// We can shorten this down later, since a lot of this is redundant
 	private static void addPerson(int seatingNumber) {
-		// JLabel personSprite = new JLabel("•");
-		// personSprite.setFont(new Font("Arial", Font.PLAIN, 100)); // Large font for a visible ball
-		// // personSprite.setForeground(Color.RED); // Set initial color
-		// personSprite.setOpaque(true); // Enable background painting
-		// personSprite.setBackground(Color.RED); // Optional: set background to contrast   
-		// personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
-		// personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-
 		JLabel personSprite = new JLabel(String.valueOf(seatingNumber));
-		// System.out.println(personSprite.getFont().getSize());
-		personSprite.setFont(new Font("Arial", Font.PLAIN, 8)); // Large font for a visible ball
-		personSprite.setOpaque(true); // Enable background painting
-		personSprite.setBackground(red); // Optional: set background to contrast   
+		personSprite.setFont(new Font("Arial", Font.PLAIN, 8));
+		personSprite.setOpaque(true);
+		personSprite.setBackground(red);
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
 		Person test = new Person(seatingNumber, false, personSprite, new ArrayList<>());
@@ -91,9 +83,27 @@ public class CS2420_Semester_Project {
 			while (true) {
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > CLOCK_SPEED) {
+					if (personCount == people.size()) break;
+					queueMovementToLocation(people.get(personCount), targetLocation);
+					startTime = System.currentTimeMillis();
+					personCount++;
+				}
+			}
+			Thread.currentThread().interrupt();
+		};
+		startThread(task);
+	}
+	private static void moveAllToSeat(List<Person> people) {
+		Runnable task = () -> {
+			long startTime = System.currentTimeMillis();
+			int personCount = 0;
+			while (true) {
+				long tempTime = System.currentTimeMillis();
+				if (tempTime - startTime > CLOCK_SPEED) {
 					if (personCount == people.size())
 						break;
-					moveToLocation_YPriority(people.get(personCount), targetLocation);
+					Location targetLocation = new Location(people.get(personCount).getSeatX(), people.get(personCount).getSeatY());
+					queueMovementToLocation(people.get(personCount), targetLocation);
 					startTime = System.currentTimeMillis();
 					personCount++;
 				}
@@ -104,56 +114,25 @@ public class CS2420_Semester_Project {
 	}
 
 	
-	private static void makeLoggerClock() {
-		Runnable task = () -> {
-			long startTime = System.currentTimeMillis();
-			while (true) {
-				long tempTime = System.currentTimeMillis();
-				if (tempTime - startTime > CLOCK_SPEED) {
-					startTime = System.currentTimeMillis();
+	// private static void makeLoggerClock() {
+	// 	Runnable task = () -> {
+	// 		long startTime = System.currentTimeMillis();
+	// 		while (true) {
+	// 			long tempTime = System.currentTimeMillis();
+	// 			if (tempTime - startTime > CLOCK_SPEED) {
+	// 				startTime = System.currentTimeMillis();
 
-				}
-			}
-		};
-		startThread(task);
-	}
-
-
-	private static void moveToLocation_YPriority(Person person, Location targetLocation) {
-		Runnable task = () -> {
-			long startTime = System.currentTimeMillis();
-			while (true) {
-				long tempTime = System.currentTimeMillis();
-				if (tempTime - startTime > CLOCK_SPEED) {
-					startTime = System.currentTimeMillis();
-					if (person.getY() < targetLocation.y()) {
-						person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
-					} else if (person.getY() > targetLocation.y()) {
-						person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
-					} else if (person.getX() < targetLocation.x()) {
-						person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
-					} else if (person.getX() > targetLocation.x()) {
-						person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
-					} else {
-						person.isMoving = false;
-						break;
-					}
-					
-				}
-			}
-			Thread.currentThread().interrupt();
-		};
-		while (true) {
-			if (!person.isMoving) {
-				person.isMoving = true;
-				startThread(task);
-				person.setColor(Color.RED);
-				break;
-			}
-		}
-	}
+	// 			}
+	// 		}
+	// 	};
+	// 	startThread(task);
+	// }
 
 	private static void queueMovementToLocation(Person person, Location targetLocation) {
+		if (targetLocation.x() % 15 != 0 || targetLocation.y() % 23 != 4) {
+			System.out.println("BAD LOCATION:\nX: " + targetLocation.x() + "\nY: " + targetLocation.y());
+			return;
+		}
 		Runnable task = () -> {
 			while (!person.moveToLocationQueue.isEmpty()) {
 				moveToLocationQueuedVertical(person);
@@ -167,16 +146,17 @@ public class CS2420_Semester_Project {
 			startThread(task);
 		}
 	}
-
+	
 	// Prioritizes Vertical (up and down) movement over Horizontal
 	private static void moveToLocationQueuedVertical(Person person) {
 		Location targetLocation = person.moveToLocationQueue.getFirst();
 		System.out.println("Started moving to " + targetLocation);
 		long startTime = System.currentTimeMillis();
+		long clockStartTime = startTime;
 		while (true) {
 			long tempTime = System.currentTimeMillis();
-			if (tempTime - startTime > CLOCK_SPEED) {
-				startTime = System.currentTimeMillis();
+			if (tempTime - clockStartTime > CLOCK_SPEED) {
+				clockStartTime = System.currentTimeMillis();
 				if (person.getY() < targetLocation.y()) {
 					person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
 				} else if (person.getY() > targetLocation.y()) {
@@ -189,7 +169,9 @@ public class CS2420_Semester_Project {
 					person.isMoving = false;
 					break;
 				}
-				
+			}
+			if (tempTime - startTime > 5000) {
+				System.out.println("PERSON " + person.personID + " IS TAKING TOO LONG\nCURRENT LOCATION: " + person.getX() + " " + person.getY() + "\nDESIRED LOCATION: " + targetLocation.x() + " " + targetLocation.y());
 			}
 		}
 		person.setColor(Color.RED);
@@ -202,12 +184,12 @@ public class CS2420_Semester_Project {
 		switch (keyCode) {
 			// KeyEvent.VK_SPACE will check for when the spacebar is pressed and case an
 			// event
+
+			// (I)nit, (Y)ass queen
+
 			case KeyEvent.VK_SPACE:
-				for (int i = 0; i < peopleArr.size(); i++) {
-					Person testPerson = peopleArr.get(i);
-					Timer timer = new Timer();
-					timer.schedule(new MoveInCircleTimer(testPerson), i * CLOCK_SPEED, CLOCK_SPEED);
-				}
+				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				moveAllToSeat(peopleArr);
 				break;
 			case KeyEvent.VK_W:
 				for (int i = 0; i < peopleArr.size(); i++) {
@@ -250,7 +232,7 @@ public class CS2420_Semester_Project {
 				moveAllToLocation(peopleArr, new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_I:
-				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_O:
 				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X+PERSON_STEP_X*3, PLANE_GRID_2_Y-PERSON_STEP_Y));
@@ -259,8 +241,18 @@ public class CS2420_Semester_Project {
 				moveAllToLocation(peopleArr, new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y));
 				break;
 
+			case KeyEvent.VK_Y:
+				moveAllToSeat(peopleArr);
+				break;
+
 			case KeyEvent.VK_Q:
 				System.exit(0);
+				break;
+			case KeyEvent.VK_R:
+				for (Person person : peopleArr) {
+					person.setX(PERSON_SPAWN_X);
+					person.setY(PERSON_SPAWN_Y);
+				}
 				break;
 			// // Example keybind for letter 'e'
 			// case KeyEvent.VK_E:
@@ -286,83 +278,26 @@ public class CS2420_Semester_Project {
 		thread.start();
 	}
 
-	// private void immediateTimer(int clockSpeed, Runnnable methodToRun) {
-
-	// 	long startTime = System.currentTimeMillis();
-	// 	while (true) {
-	// 		long tempTime = System.currentTimeMillis();
-	// 		if (tempTime - startTime > CLOCK_SPEED) {
-	// 			startTime = System.currentTimeMillis();
-	// 			if (person.getY() < targetLocation.y()) {
-	// 				person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
-	// 			} else if (person.getY() > targetLocation.y()) {
-	// 				person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
-	// 			} else if (person.getX() < targetLocation.x()) {
-	// 				person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
-	// 			} else if (person.getX() > targetLocation.x()) {
-	// 				person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
-	// 			} else {
-	// 				person.isMoving = false;
-	// 				break;
-	// 			}
-				
-	// 		}
-	// 	}
-	// }
-}
-
-class MoveInCircleTimer extends TimerTask {
-	private final Person person;
-
-	MoveInCircleTimer(Person person) {
-		this.person = person;
-	}
-
-	int count = 1;
-
-	public void run() {
-		// Simple circle loop
-		switch (count) {
-			case 1:
-				this.person.moveX(-15);
-				count++;
-				break;
-			case 2:
-				this.person.moveY(-15);
-				count++;
-				break;
-			case 3:
-				this.person.moveX(15);
-				count++;
-				break;
-			case 4:
-				this.person.moveY(15);
-				count = 1;
-				break;
+	private static void immediateTimer(int clockSpeed, Runnable methodToRun) {
+		long startTime = System.currentTimeMillis();
+		startThread(methodToRun);
+		while (true) {
+			long tempTime = System.currentTimeMillis();
+			if (tempTime - startTime > clockSpeed) {
+				startTime = System.currentTimeMillis();
+				startThread(methodToRun);
+			}
 		}
-		// System.out.println(count);
 	}
+	private static void delayedTimer(int clockSpeed, Runnable methodToRun) {
+		long startTime = System.currentTimeMillis();
+		while (true) {
+			long tempTime = System.currentTimeMillis();
+			if (tempTime - startTime > clockSpeed) {
+				startTime = System.currentTimeMillis();
+				startThread(methodToRun);
+			}
+		}
+	}
+
 }
-
-// Needed to run sim people actions at a constant interval, works as a timer
-// class MainClock extends TimerTask {
-// private final int CLOCK_SPEED;
-
-// MainClock(int CLOCK_SPEED) {
-// this.CLOCK_SPEED = CLOCK_SPEED;
-// }
-
-// public void run() {
-
-// }
-// }
-
-// class MoveToPointTimer extends TimerTask {
-// public Person person;
-// private int x;
-// private int y;
-// MoveToPointTimer(Person person, int x, int y) {
-// this.person = person;
-// this.x = x;
-// this.y = y;
-// }
