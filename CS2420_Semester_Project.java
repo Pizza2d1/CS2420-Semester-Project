@@ -10,6 +10,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,7 +18,7 @@ import javax.swing.JPanel;
 public class CS2420_Semester_Project {
 
 	// Testing variables
-	static boolean peopleCollision = true;
+	static boolean peopleCollision = false;
 
 	static Color red = Color.getHSBColor(0, 100, 50);
 
@@ -25,6 +26,7 @@ public class CS2420_Semester_Project {
 	static List<Person> peopleArr = new ArrayList<>();
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
+
 
 	// NOTE: To start the clock you need to press space
 	public static void main(String[] args) {
@@ -47,9 +49,6 @@ public class CS2420_Semester_Project {
 			}
 		});
 
-		// Coding in main should go here
-		// TODO Backend stuff
-
 		// Example adding people with seating numbers
 		for (int i = 1; i <= 20; i++) {
 			addPerson(i);
@@ -62,6 +61,8 @@ public class CS2420_Semester_Project {
 			System.out.println("SEAT X: " + person.getSeatX());
 			System.out.println("SEAT Y: " + person.getSeatY());
 		}
+
+		mainClock();
 	}
 
 	private static void addPerson(int seatingNumber) {
@@ -76,15 +77,15 @@ public class CS2420_Semester_Project {
 		contentPane.add(test.personSprite);
 	}
 
-	private static void moveAllToLocation(List<Person> people, Location targetLocation) {
+	private static void moveAllToLocation(Location targetLocation) {
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
 			int personCount = 0;
 			while (true) {
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > CLOCK_SPEED) {
-					if (personCount == people.size()) break;
-					queueMovementToLocation(people.get(personCount), targetLocation);
+					if (personCount == peopleArr.size()) break;
+					queueMovementToLocation(peopleArr.get(personCount), targetLocation);
 					startTime = System.currentTimeMillis();
 					personCount++;
 				}
@@ -93,7 +94,28 @@ public class CS2420_Semester_Project {
 		};
 		startThread(task);
 	}
-	private static void moveAllToSeat(List<Person> people) {
+
+	// private static void moveAllToLocationTesting(Location targetLocation) {
+	// 	for (Person person : peopleArr) {
+	// 		queueMovementToLocation(person, targetLocation);
+	// 	}
+	// }
+
+	private static void mainClock() {
+		Runnable task = () -> {
+			long startTime = System.currentTimeMillis();
+			while (true) {
+				long tempTime = System.currentTimeMillis();
+				if (tempTime - startTime > CLOCK_SPEED) {
+					startTime = System.currentTimeMillis();
+					movePeopleVerticalPriority();
+				}
+			}
+		};
+		startThread(task);
+	}
+
+	private static void moveAllToSeats(List<Person> people) {
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
 			int personCount = 0;
@@ -113,71 +135,60 @@ public class CS2420_Semester_Project {
 		startThread(task);
 	}
 
-	
-	// private static void makeLoggerClock() {
-	// 	Runnable task = () -> {
-	// 		long startTime = System.currentTimeMillis();
-	// 		while (true) {
-	// 			long tempTime = System.currentTimeMillis();
-	// 			if (tempTime - startTime > CLOCK_SPEED) {
-	// 				startTime = System.currentTimeMillis();
-
-	// 			}
-	// 		}
-	// 	};
-	// 	startThread(task);
-	// }
+	// For loading
+	private static void movePeopleVerticalPriority() {
+		for (Person person : peopleArr) {
+			if (person.moveToLocationQueue.isEmpty()) continue;
+			Location targetLocation = person.moveToLocationQueue.getFirst();
+			System.out.println("Started moving to " + targetLocation);
+			if (person.getY() < targetLocation.y()) {
+				person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
+			} else if (person.getY() > targetLocation.y()) {
+				person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
+			} else if (person.getX() < targetLocation.x()) {
+				person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
+			} else if (person.getX() > targetLocation.x()) {
+				person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
+			} else {
+				person.isMoving = false;
+				person.setColor(Color.RED);
+				person.moveToLocationQueue.removeFirst();
+				System.out.println("Finished moving");
+			}
+		}
+	}
+	// For unloading
+	private static void movePeopleHorizontalPriority() {
+		for (Person person : peopleArr) {
+			if (person.moveToLocationQueue.isEmpty()) continue;
+			Location targetLocation = person.moveToLocationQueue.getFirst();
+			System.out.println("Started moving to " + targetLocation);
+			if (person.getX() < targetLocation.x()) {
+				person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
+			} else if (person.getX() > targetLocation.x()) {
+				person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
+			} else if (person.getY() < targetLocation.y()) {
+				person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
+			} else if (person.getY() > targetLocation.y()) {
+				person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
+			} else {
+				person.isMoving = false;
+				person.setColor(Color.RED);
+				person.moveToLocationQueue.removeFirst();
+				System.out.println("Finished moving");
+			}
+		}
+	}
 
 	private static void queueMovementToLocation(Person person, Location targetLocation) {
-		if (targetLocation.x() % 15 != 0 || targetLocation.y() % 23 != 4) {
-			System.out.println("BAD LOCATION:\nX: " + targetLocation.x() + "\nY: " + targetLocation.y());
+		if (targetLocation.x() % PERSON_STEP_X != 0 || targetLocation.y() % PERSON_STEP_Y != 4) {
+			System.out.println("BAD LOCATION INPUT:\nX: " + targetLocation.x() + "\nY: " + targetLocation.y());
 			return;
 		}
-		Runnable task = () -> {
-			while (!person.moveToLocationQueue.isEmpty()) {
-				moveToLocationQueuedVertical(person);
-			}
-			Thread.currentThread().interrupt();
-		};
-
+		System.out.println("Queued");
 		person.moveToLocationQueue.add(targetLocation);
-		if (!person.isMoving) {
-			person.isMoving = true;
-			startThread(task);
-		}
 	}
 	
-	// Prioritizes Vertical (up and down) movement over Horizontal
-	private static void moveToLocationQueuedVertical(Person person) {
-		Location targetLocation = person.moveToLocationQueue.getFirst();
-		System.out.println("Started moving to " + targetLocation);
-		long startTime = System.currentTimeMillis();
-		long clockStartTime = startTime;
-		while (true) {
-			long tempTime = System.currentTimeMillis();
-			if (tempTime - clockStartTime > CLOCK_SPEED) {
-				clockStartTime = System.currentTimeMillis();
-				if (person.getY() < targetLocation.y()) {
-					person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
-				} else if (person.getY() > targetLocation.y()) {
-					person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
-				} else if (person.getX() < targetLocation.x()) {
-					person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
-				} else if (person.getX() > targetLocation.x()) {
-					person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
-				} else {
-					person.isMoving = false;
-					break;
-				}
-			}
-			if (tempTime - startTime > 5000) {
-				System.out.println("PERSON " + person.personID + " IS TAKING TOO LONG\nCURRENT LOCATION: " + person.getX() + " " + person.getY() + "\nDESIRED LOCATION: " + targetLocation.x() + " " + targetLocation.y());
-			}
-		}
-		person.setColor(Color.RED);
-		person.moveToLocationQueue.removeFirst();
-		System.out.println("Finished moving");
-	}
 
 	// Interprets keyboard clicks (For starting and pausing actions)
 	static void action(int keyCode) throws IOException {
@@ -185,11 +196,10 @@ public class CS2420_Semester_Project {
 			// KeyEvent.VK_SPACE will check for when the spacebar is pressed and case an
 			// event
 
-			// (I)nit, (Y)ass queen
-
+			// START SIMULATION
 			case KeyEvent.VK_SPACE:
-				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
-				moveAllToSeat(peopleArr);
+				moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				moveAllToSeats(peopleArr);
 				break;
 			case KeyEvent.VK_W:
 				for (int i = 0; i < peopleArr.size(); i++) {
@@ -229,26 +239,32 @@ public class CS2420_Semester_Project {
 				break;
 
 			case KeyEvent.VK_U:
-				moveAllToLocation(peopleArr, new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
+				moveAllToLocation(new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_I:
-				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_O:
-				moveAllToLocation(peopleArr, new Location(PLANE_GRID_2_X+PERSON_STEP_X*3, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				moveAllToLocation(new Location(PLANE_GRID_2_X+PERSON_STEP_X*3, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_P:
-				moveAllToLocation(peopleArr, new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y));
+				moveAllToLocation(new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y));
 				break;
 
 			case KeyEvent.VK_Y:
-				moveAllToSeat(peopleArr);
+				moveAllToSeats(peopleArr);
 				break;
 
 			case KeyEvent.VK_Q:
 				System.exit(0);
 				break;
+			
+			// RESET
 			case KeyEvent.VK_R:
+				int temp = CLOCK_SPEED;
+				CLOCK_SPEED = 1;
+				sleepy(100);
+				CLOCK_SPEED = temp;
 				for (Person person : peopleArr) {
 					person.setX(PERSON_SPAWN_X);
 					person.setY(PERSON_SPAWN_Y);
@@ -277,27 +293,4 @@ public class CS2420_Semester_Project {
 		Thread thread = new Thread(task);
 		thread.start();
 	}
-
-	private static void immediateTimer(int clockSpeed, Runnable methodToRun) {
-		long startTime = System.currentTimeMillis();
-		startThread(methodToRun);
-		while (true) {
-			long tempTime = System.currentTimeMillis();
-			if (tempTime - startTime > clockSpeed) {
-				startTime = System.currentTimeMillis();
-				startThread(methodToRun);
-			}
-		}
-	}
-	private static void delayedTimer(int clockSpeed, Runnable methodToRun) {
-		long startTime = System.currentTimeMillis();
-		while (true) {
-			long tempTime = System.currentTimeMillis();
-			if (tempTime - startTime > clockSpeed) {
-				startTime = System.currentTimeMillis();
-				startThread(methodToRun);
-			}
-		}
-	}
-
 }

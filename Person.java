@@ -39,20 +39,21 @@ public class Person {
     }
     
     public int getSeatX() {
+        // For math simplicity
+        int seatingID = personID-1;
         // First row
-        if (personID % 6 <= 3) {
-            return ((personID % 3) - 1) * PERSON_STEP_X + PLANE_GRID_1_X;
+        if (seatingID % 6 < 3) {
+            return (seatingID % 3) * PERSON_STEP_X + PLANE_GRID_1_X;
         } else {
         // Second row
-            return ((personID % 3) - 1) * PERSON_STEP_X + PLANE_GRID_2_X;
+            return (seatingID % 3) * PERSON_STEP_X + PLANE_GRID_2_X;
         }
     }
     public int getSeatY() {
-        if (personID % 6 == 0) {
-            return (personID / 6 - 1) * PERSON_STEP_Y + PLANE_GRID_1_Y;
-        }
-        return (personID / 6) * PERSON_STEP_Y + PLANE_GRID_1_Y;
+        int seatingID = personID-1;
+        return (seatingID / 6) * PERSON_STEP_Y + PLANE_GRID_1_Y;
     }
+
     public int getX() {
         return this.personSprite.getX();
     }
@@ -81,8 +82,9 @@ public class Person {
 
     // Collision checking movements
     public void moveX(int offset, List<Person> peopleArr, boolean peopleCollision) {
-        if (peopleCollision) {
-            lockMovementForCollision(peopleArr, getX() + offset, getY());
+        if (peopleCollision && checkForCollision(peopleArr, getX() + offset, getY())) {
+            return;
+            // lockMovementForCollision(peopleArr, getX() + offset, getY());
         }
         setX(this.personSprite.getX() + offset);
         setColor(Color.GREEN);
@@ -90,19 +92,13 @@ public class Person {
     }
 
     public void moveY(int offset, List<Person> peopleArr, boolean peopleCollision) {
-        if (peopleCollision) {
-            lockMovementForCollision(peopleArr, getX(), getY() + offset);
+        if (peopleCollision && checkForCollision(peopleArr, getX(), getY() + offset)) {
+            return;
+            // lockMovementForCollision(peopleArr, getX(), getY() + offset);
         }
         setY(this.personSprite.getY() + offset);
         setColor(Color.GREEN);
         if (REPORT_MOVEMENT) System.out.println(String.format("New Y pos: %d", getY()));
-    }
-
-    // Will make the person wait for a open space to move
-    private void lockMovementForCollision(List<Person> peopleArr, int target_x, int target_y) {
-        while (true) {
-            if (!checkForCollision(peopleArr, target_x, target_y)) break;
-        }
     }
 
     private boolean checkForCollision(List<Person> peopleArr, int target_x, int target_y) {
