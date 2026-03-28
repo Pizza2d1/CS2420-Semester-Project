@@ -56,9 +56,9 @@ public class PlaneGui extends JFrame {
 		for (int i = 0; i < 90; i++) {
 			addGridSeat(GridPanel2);
 		}
-		contentPane.add(GridPanel1);
-		contentPane.add(GridPanel2);
-		contentPane.add(planeDisplay);
+		// contentPane.add(GridPanel1);
+		// contentPane.add(GridPanel2);
+		// contentPane.add(planeDisplay);
 	}
 	
 	public final void addGridSeat(JPanel panel) {

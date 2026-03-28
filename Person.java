@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 public class Person {
 
     // Testing variables
-    private static final boolean REPORT_MOVEMENT = false;
+    private static final boolean REPORT_MOVEMENT = true;
     private static final boolean REPORT_COLLISIONS = false;
 
     // Make sure it follows the person png size
@@ -31,13 +31,18 @@ public class Person {
     public JLabel personSprite;
     public List<Location> moveToLocationQueue;
     public State state;
+    public Location location;
+    public Location seatLocation = new Location(0, 0);
 
-    public Person(int personID, boolean isMoving, JLabel personSprite, List<Location> moveToLocationQueue, State state) {
+    public Person(int personID, boolean isMoving, JLabel personSprite, Location location, List<Location> moveToLocationQueue, State state) {
         this.personID = personID;
         this.isMoving = isMoving;
         this.personSprite = personSprite;
+        this.location = location;
         this.moveToLocationQueue = moveToLocationQueue;
         this.state = state;
+        seatLocation.x = getSeatX(); 
+        seatLocation.y = getSeatY(); 
     }
     
     public int getSeatX() {
@@ -50,59 +55,68 @@ public class Person {
     }
 
     public int getX() {
-        return this.personSprite.getX();
+        return location.x;
     }
     public void setX(int new_x_pos) {
-        personSprite.setLocation(new_x_pos, getY());
+        location.x = new_x_pos;
+        updateSprite();
+        // personSprite.setLocation(new_x_pos, getY());
     }
 
     public int getY() {
-        return this.personSprite.getY();
+        return location.y;
     }
     public void setY(int new_y_pos) {
-        personSprite.setLocation(getX(), new_y_pos);
+        location.y = new_y_pos;
+        updateSprite();
+        // personSprite.setLocation(getX(), new_y_pos);
     }
 
     public void moveX(int offset) {
-        setX(this.personSprite.getX() + offset);
-        if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", getX()));
+        setX(location.x + offset);
+        if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", location.x));
     }
 
     public void moveY(int offset) {
-        setY(this.personSprite.getY() + offset);
-        if (REPORT_MOVEMENT) System.out.println(String.format("New Y pos: %d", getY()));
+        setY(location.y + offset);
+        if (REPORT_MOVEMENT) System.out.println(String.format("New Y pos: %d", location.y));
     }
 
     // Collision checking movements
     public void moveX(int offset, List<Person> peopleArr, boolean peopleCollision) {
-        if (peopleCollision && checkForCollision(peopleArr, getX() + offset, getY())) {
+        Location targetLocation = location;
+        targetLocation.x+=offset;
+        checkForCollision(peopleArr, targetLocation);
+        if (peopleCollision && state == State.BLOCKED) {
             return;
             // lockMovementForCollision(peopleArr, getX() + offset, getY());
         }
-        setX(this.personSprite.getX() + offset);
+        setX(location.x + offset);
         setColor(Color.GREEN);
         state = State.MOVING;
-        if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", getX()));
+        if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", location.x));
     }
 
     public void moveY(int offset, List<Person> peopleArr, boolean peopleCollision) {
-        checkForCollision(peopleArr, getX(), getY() + offset);
+        Location targetLocation = location;
+        targetLocation.y+=offset;
+        checkForCollision(peopleArr, targetLocation);
         if (peopleCollision && state == State.BLOCKED) {
             return;
         }
-        setY(this.personSprite.getY() + offset);
+        setY(location.y + offset);
         setColor(Color.GREEN);
         state = State.MOVING;
-        if (REPORT_MOVEMENT) System.out.println(String.format("New Y pos: %d", getY()));
+        if (REPORT_MOVEMENT) System.out.println(String.format("Person: " + personID + "\nNew Y pos: %d", location.y));
     }
 
-    private boolean checkForCollision(List<Person> peopleArr, int target_x, int target_y) {
+    private boolean checkForCollision(List<Person> peopleArr, Location targetLocation) {
         for (Person other_person : peopleArr) {
-            if (this.equals(other_person)) break;
-            if (target_x == other_person.getX() && target_y == other_person.getY()) {
+            if (equals(other_person)) break;
+            if (targetLocation.equals(other_person.location)) {
                 if (REPORT_COLLISIONS) {
                     System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
-                    this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
+                    personID, location.x, location.y, other_person.personID, other_person.location.x, other_person.location.y));
                 }
                 setColor(Color.YELLOW);
                 if (state == State.BLOCKED) return false; // Force movement if blocked for more than a tick
@@ -114,15 +128,25 @@ public class Person {
         return false;
     }
 
-
+    private void updateSprite() {
+        personSprite.setLocation(location.x, location.y);
+    }
     public void setColor(Color newColor) {
-        this.personSprite.setBackground(newColor);
-        this.personSprite.repaint();;
+        personSprite.setBackground(newColor);
+        personSprite.repaint();;
     }
 }
 
 
-record Location(int x, int y) {
+// Couldn't use java record because they are immutable, big sad
+class Location {
+   	public int x;
+   	public int y;
+	public Location(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+    
     @Override
     public String toString() {
       return "X: " + x + " Y: " + y;
@@ -142,7 +166,7 @@ record Location(int x, int y) {
         return this.x == p1.x
             && this.y == p1.y;
     }
-};
+}
 
 enum State {
     BLOCKED,
@@ -151,16 +175,7 @@ enum State {
 }
 
 
-
-// // Couldn't use java record because they are immutable, big sad
-// class Location {
-//    	public int x;
-//    	public int y;
-// 	public Location(int x, int y) {
-// 		this.x = x;
-// 		this.y = y;
-// 	}
-    
+// record Location(int x, int y) {
 //     @Override
 //     public String toString() {
 //       return "X: " + x + " Y: " + y;
@@ -180,4 +195,4 @@ enum State {
 //         return this.x == p1.x
 //             && this.y == p1.y;
 //     }
-// }
+// };

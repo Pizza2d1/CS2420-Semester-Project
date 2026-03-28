@@ -60,8 +60,8 @@ public class CS2420_Semester_Project {
 
 		// for (Person person : peopleArr) {
 		// 	System.out.println("PERSON ID: " + person.personID);
-		// 	System.out.println("SEAT X: " + person.getSeatX());
-		// 	System.out.println("SEAT Y: " + person.getSeatY());
+		// 	System.out.println("SEAT X: " + person.getSeatx);
+		// 	System.out.println("SEAT Y: " + person.getSeaty);
 		// }
 
 		mainClock();
@@ -77,7 +77,7 @@ public class CS2420_Semester_Project {
 		personSprite.setBackground(red);
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-		Person test = new Person(seatingNumber, false, personSprite, new ArrayList<>(), State.MOVING);
+		Person test = new Person(seatingNumber, false, personSprite, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), new ArrayList<>(), State.MOVING);
 		peopleArr.add(test);
 		contentPane.add(test.personSprite);
 	}
@@ -88,6 +88,7 @@ public class CS2420_Semester_Project {
 			while (true) {
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > CLOCK_SPEED) {
+					System.out.println("tick");
 					startTime = System.currentTimeMillis();
 
 					// Actions per tick happen here vvv
@@ -147,7 +148,7 @@ public class CS2420_Semester_Project {
 				if (tempTime - startTime > CLOCK_SPEED) {
 					if (personCount == people.size())
 						break;
-					Location targetLocation = new Location(people.get(personCount).getSeatX(), people.get(personCount).getSeatY());
+					Location targetLocation = new Location(people.get(personCount).seatLocation.x, people.get(personCount).seatLocation.y);
 					queueMovementToLocation(people.get(personCount), targetLocation);
 					startTime = System.currentTimeMillis();
 					personCount++;
@@ -159,10 +160,10 @@ public class CS2420_Semester_Project {
 	}
 
 	private static void queueMovementToLocation(Person person, Location targetLocation) {
-		if (targetLocation.x() % PERSON_STEP_X != 0 || targetLocation.y() % PERSON_STEP_Y != 4) {
-			System.out.println("BAD LOCATION INPUT:\nX: " + targetLocation.x() + "\nY: " + targetLocation.y());
+		if (targetLocation.x % PERSON_STEP_X != 0 || targetLocation.y % PERSON_STEP_Y != 4) {
+			System.out.println("BAD LOCATION INPUT:\nX: " + targetLocation.x + "\nY: " + targetLocation.y);
 			return;
-		} else if (person.getX() == targetLocation.x() && person.getY() == targetLocation.y()) {
+		} else if (person.location.x == targetLocation.x && person.location.y == targetLocation.y) {
 			System.out.println("Location already reached");
 			return;
 		}
@@ -176,13 +177,13 @@ public class CS2420_Semester_Project {
 			if (person.moveToLocationQueue.isEmpty()) continue;
 			Location targetLocation = person.moveToLocationQueue.getFirst();
 			System.out.println("Started moving to " + targetLocation);
-			if (person.getY() < targetLocation.y()) {
+			if (person.location.y < targetLocation.y) {
 				person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
-			} else if (person.getY() > targetLocation.y()) {
+			} else if (person.location.y > targetLocation.y) {
 				person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
-			} else if (person.getX() < targetLocation.x()) {
+			} else if (person.location.x < targetLocation.x) {
 				person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
-			} else if (person.getX() > targetLocation.x()) {
+			} else if (person.location.x > targetLocation.x) {
 				person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
 			} else {
 				person.isMoving = false;
@@ -199,13 +200,13 @@ public class CS2420_Semester_Project {
 			if (person.moveToLocationQueue.isEmpty()) continue;
 			Location targetLocation = person.moveToLocationQueue.getFirst();
 			System.out.println("Started moving to " + targetLocation);
-			if (person.getX() < targetLocation.x()) {
+			if (person.location.x < targetLocation.x) {
 				person.moveX(PERSON_STEP_X, peopleArr, peopleCollision);
-			} else if (person.getX() > targetLocation.x()) {
+			} else if (person.location.x > targetLocation.x) {
 				person.moveX(-PERSON_STEP_X, peopleArr, peopleCollision);
-			} else if (person.getY() < targetLocation.y()) {
+			} else if (person.location.y < targetLocation.y) {
 				person.moveY(PERSON_STEP_Y, peopleArr, peopleCollision);
-			} else if (person.getY() > targetLocation.y()) {
+			} else if (person.location.y > targetLocation.y) {
 				person.moveY(-PERSON_STEP_Y, peopleArr, peopleCollision);
 			} else {
 				person.isMoving = false;
@@ -218,7 +219,7 @@ public class CS2420_Semester_Project {
 	}
 
 	public static boolean checkIfSeated(Person person) {
-		if (person.getX() == person.getSeatX() && person.getY() == person.getSeatY()) {
+		if (person.location.x == person.getSeatX() && person.location.y == person.getSeatY()) {
 			person.state = State.SEATED;
 			return true;
 		}
