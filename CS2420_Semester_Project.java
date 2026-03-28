@@ -219,7 +219,7 @@ public class CS2420_Semester_Project {
 	}
 
 	public static boolean checkIfSeated(Person person) {
-		if (person.location.x == person.getSeatX() && person.location.y == person.getSeatY()) {
+		if (person.location.equals(person.seatLocation)) {
 			person.state = State.SEATED;
 			return true;
 		}
