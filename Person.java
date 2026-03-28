@@ -30,24 +30,19 @@ public class Person {
     public boolean isMoving;
     public JLabel personSprite;
     public List<Location> moveToLocationQueue;
+    public State state;
 
-    public Person(int personID, boolean isMoving, JLabel personSprite, List<Location> moveToLocationQueue) {
+    public Person(int personID, boolean isMoving, JLabel personSprite, List<Location> moveToLocationQueue, State state) {
         this.personID = personID;
         this.isMoving = isMoving;
         this.personSprite = personSprite;
         this.moveToLocationQueue = moveToLocationQueue;
+        this.state = state;
     }
     
     public int getSeatX() {
-        // For math simplicity
         int seatingID = personID-1;
-        // First row
-        if (seatingID % 6 < 3) {
-            return (seatingID % 3) * PERSON_STEP_X + PLANE_GRID_1_X;
-        } else {
-        // Second row
-            return (seatingID % 3) * PERSON_STEP_X + PLANE_GRID_2_X;
-        }
+        return (seatingID % 3) * PERSON_STEP_X + ((seatingID % 6 < 3) ? PLANE_GRID_1_X : PLANE_GRID_2_X);
     }
     public int getSeatY() {
         int seatingID = personID-1;
@@ -59,7 +54,6 @@ public class Person {
     }
     public void setX(int new_x_pos) {
         personSprite.setLocation(new_x_pos, getY());
-        // System.out.println(String.format("New X pos: %d", new_x_pos));
     }
 
     public int getY() {
@@ -67,7 +61,6 @@ public class Person {
     }
     public void setY(int new_y_pos) {
         personSprite.setLocation(getX(), new_y_pos);
-        // System.out.println(String.format("New Y pos: %d", new_y_pos));
     }
 
     public void moveX(int offset) {
@@ -88,16 +81,18 @@ public class Person {
         }
         setX(this.personSprite.getX() + offset);
         setColor(Color.GREEN);
+        state = State.MOVING;
         if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", getX()));
     }
 
     public void moveY(int offset, List<Person> peopleArr, boolean peopleCollision) {
-        if (peopleCollision && checkForCollision(peopleArr, getX(), getY() + offset)) {
+        checkForCollision(peopleArr, getX(), getY() + offset);
+        if (peopleCollision && state == State.BLOCKED) {
             return;
-            // lockMovementForCollision(peopleArr, getX(), getY() + offset);
         }
         setY(this.personSprite.getY() + offset);
         setColor(Color.GREEN);
+        state = State.MOVING;
         if (REPORT_MOVEMENT) System.out.println(String.format("New Y pos: %d", getY()));
     }
 
@@ -105,38 +100,20 @@ public class Person {
         for (Person other_person : peopleArr) {
             if (this.equals(other_person)) break;
             if (target_x == other_person.getX() && target_y == other_person.getY()) {
-                if (REPORT_COLLISIONS)
+                if (REPORT_COLLISIONS) {
                     System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
                     this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
+                }
                 setColor(Color.YELLOW);
+                if (state == State.BLOCKED) return false; // Force movement if blocked for more than a tick
+                state = State.BLOCKED;
                 return true;
             }
         }
+        state = State.MOVING;
         return false;
     }
 
-    /*
-    * Ugly nested code, if you get further than 4 tabs, then split it into functions like above
-    */
-    // private void checkForCollision(List<Person> peopleArr, int target_x, int target_y) {
-    //     boolean flag;
-    //     while (true) {
-    //         flag = false;
-    //         for (Person other_person : peopleArr) {
-    //             if (this.equals(other_person)) break;
-    //             if (target_x == other_person.getX() && target_y == other_person.getY()) {
-    //                 if (REPORT_COLLISIONS)
-    //                     System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
-    //                     this.personID, getX(), getY(), other_person.personID, other_person.getX(),other_person.getY()));
-    //                 setColor(Color.YELLOW);
-    //                 flag = true;
-    //                 break;
-    //             }
-    //         }
-    //         if (!flag) break;
-    //     }
-    //     setColor(Color.GREEN);
-    // }
 
     public void setColor(Color newColor) {
         this.personSprite.setBackground(newColor);
@@ -166,6 +143,12 @@ record Location(int x, int y) {
             && this.y == p1.y;
     }
 };
+
+enum State {
+    BLOCKED,
+    MOVING,
+    SEATED
+}
 
 
 

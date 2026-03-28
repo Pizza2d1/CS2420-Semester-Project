@@ -1,6 +1,7 @@
 package CS2420_Semester_Project;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -32,6 +33,7 @@ public class PlaneGui extends JFrame {
 
 	final static int PLANE_GRID_2_X = 345;
 	final static int PLANE_GRID_2_Y = 188;
+
 
 	public PlaneGui(List<Person> peopleArr, JLabel planeDisplay, JPanel contentPane) {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

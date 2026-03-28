@@ -18,7 +18,8 @@ import javax.swing.JPanel;
 public class CS2420_Semester_Project {
 
 	// Testing variables
-	static boolean peopleCollision = false;
+	static boolean peopleCollision = true;
+	static boolean shuffle_people = false;
 
 	static Color red = Color.getHSBColor(0, 100, 50);
 
@@ -26,9 +27,11 @@ public class CS2420_Semester_Project {
 	static List<Person> peopleArr = new ArrayList<>();
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
+	static JLabel tickClock = new JLabel("");
+	static boolean unloading = false;
+	static int ticks = 0;
+	static Display_Clock display_clock = Display_Clock.STOPPED;
 
-
-	// NOTE: To start the clock you need to press space
 	public static void main(String[] args) {
 		// Starts up the gui and keybinds
 		EventQueue.invokeLater(() -> {
@@ -36,7 +39,7 @@ public class CS2420_Semester_Project {
 				PlaneGui frame = new PlaneGui(peopleArr, planeDisplay, contentPane); // Can prob make this section shorter, but whatever
 				frame.setVisible(true);
 				frame.addKeyListener(new KeyAdapter() {
-          @Override
+          			@Override
 					public void keyPressed(KeyEvent e) {
 						int keyCode = e.getKeyCode();
 						try { // Two try/catch statements? Ewwww
@@ -50,19 +53,21 @@ public class CS2420_Semester_Project {
 		});
 
 		// Example adding people with seating numbers
-		for (int i = 1; i <= 20; i++) {
+		for (int i = 1; i <= 180; i++) {
 			addPerson(i);
-			// Randomize list
-			// Collections.shuffle(peopleArr);
 		}
+		if (shuffle_people) Collections.shuffle(peopleArr);
 
-		for (Person person : peopleArr) {
-			System.out.println("PERSON ID: " + person.personID);
-			System.out.println("SEAT X: " + person.getSeatX());
-			System.out.println("SEAT Y: " + person.getSeatY());
-		}
+		// for (Person person : peopleArr) {
+		// 	System.out.println("PERSON ID: " + person.personID);
+		// 	System.out.println("SEAT X: " + person.getSeatX());
+		// 	System.out.println("SEAT Y: " + person.getSeatY());
+		// }
 
 		mainClock();
+
+		// Add display clock to show amount of ticks that the simulation takes
+		displayClock();
 	}
 
 	private static void addPerson(int seatingNumber) {
@@ -72,16 +77,52 @@ public class CS2420_Semester_Project {
 		personSprite.setBackground(red);
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-		Person test = new Person(seatingNumber, false, personSprite, new ArrayList<>());
+		Person test = new Person(seatingNumber, false, personSprite, new ArrayList<>(), State.MOVING);
 		peopleArr.add(test);
 		contentPane.add(test.personSprite);
 	}
 
+	private static void mainClock() {
+		Runnable task = () -> {
+			long startTime = System.currentTimeMillis();
+			while (true) {
+				long tempTime = System.currentTimeMillis();
+				if (tempTime - startTime > CLOCK_SPEED) {
+					startTime = System.currentTimeMillis();
+
+					// Actions per tick happen here vvv
+
+					if (checkIfAllSeated()) unloading = true;
+					if (display_clock == Display_Clock.RUNNING) {
+						if (unloading) {
+							movePeopleHorizontalPriority();
+						} else {
+							movePeopleVerticalPriority();
+						}
+						ticks++;
+					}
+					tickClock.setText(String.valueOf(ticks));
+				}
+			}
+		};
+		startThread(task);
+	}
+
+	private static void displayClock() {
+		tickClock.setFont(new Font("Arial", Font.PLAIN, 20));
+		tickClock.setOpaque(true);
+		tickClock.setLocation(PERSON_SPAWN_X-50, 30);
+		tickClock.setSize(100, 100);
+		contentPane.add(tickClock);
+	}
+
 	private static void moveAllToLocation(Location targetLocation) {
+		allow_queuing();
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
 			int personCount = 0;
 			while (true) {
+				if (display_clock == Display_Clock.STOPPED) break;
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > CLOCK_SPEED) {
 					if (personCount == peopleArr.size()) break;
@@ -95,31 +136,13 @@ public class CS2420_Semester_Project {
 		startThread(task);
 	}
 
-	// private static void moveAllToLocationTesting(Location targetLocation) {
-	// 	for (Person person : peopleArr) {
-	// 		queueMovementToLocation(person, targetLocation);
-	// 	}
-	// }
-
-	private static void mainClock() {
-		Runnable task = () -> {
-			long startTime = System.currentTimeMillis();
-			while (true) {
-				long tempTime = System.currentTimeMillis();
-				if (tempTime - startTime > CLOCK_SPEED) {
-					startTime = System.currentTimeMillis();
-					movePeopleVerticalPriority();
-				}
-			}
-		};
-		startThread(task);
-	}
-
 	private static void moveAllToSeats(List<Person> people) {
+		allow_queuing();
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
 			int personCount = 0;
 			while (true) {
+				if (display_clock == Display_Clock.STOPPED) break;
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > CLOCK_SPEED) {
 					if (personCount == people.size())
@@ -133,6 +156,18 @@ public class CS2420_Semester_Project {
 			Thread.currentThread().interrupt();
 		};
 		startThread(task);
+	}
+
+	private static void queueMovementToLocation(Person person, Location targetLocation) {
+		if (targetLocation.x() % PERSON_STEP_X != 0 || targetLocation.y() % PERSON_STEP_Y != 4) {
+			System.out.println("BAD LOCATION INPUT:\nX: " + targetLocation.x() + "\nY: " + targetLocation.y());
+			return;
+		} else if (person.getX() == targetLocation.x() && person.getY() == targetLocation.y()) {
+			System.out.println("Location already reached");
+			return;
+		}
+		System.out.println("Queued");
+		person.moveToLocationQueue.add(targetLocation);
 	}
 
 	// For loading
@@ -154,6 +189,7 @@ public class CS2420_Semester_Project {
 				person.setColor(Color.RED);
 				person.moveToLocationQueue.removeFirst();
 				System.out.println("Finished moving");
+				checkIfSeated(person);
 			}
 		}
 	}
@@ -176,19 +212,30 @@ public class CS2420_Semester_Project {
 				person.setColor(Color.RED);
 				person.moveToLocationQueue.removeFirst();
 				System.out.println("Finished moving");
+				checkIfSeated(person);
 			}
 		}
 	}
 
-	private static void queueMovementToLocation(Person person, Location targetLocation) {
-		if (targetLocation.x() % PERSON_STEP_X != 0 || targetLocation.y() % PERSON_STEP_Y != 4) {
-			System.out.println("BAD LOCATION INPUT:\nX: " + targetLocation.x() + "\nY: " + targetLocation.y());
-			return;
+	public static boolean checkIfSeated(Person person) {
+		if (person.getX() == person.getSeatX() && person.getY() == person.getSeatY()) {
+			person.state = State.SEATED;
+			return true;
 		}
-		System.out.println("Queued");
-		person.moveToLocationQueue.add(targetLocation);
+		return false;
 	}
-	
+
+	public static boolean checkIfAllSeated() {
+		for (Person person : peopleArr) {
+			if (person.state != State.SEATED) {
+				return false;
+			} else {
+				continue;
+			}
+		}
+		display_clock = Display_Clock.STOPPED;
+		return true;
+	}
 
 	// Interprets keyboard clicks (For starting and pausing actions)
 	static void action(int keyCode) throws IOException {
@@ -198,8 +245,15 @@ public class CS2420_Semester_Project {
 
 			// START SIMULATION
 			case KeyEvent.VK_SPACE:
-				moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
-				moveAllToSeats(peopleArr);
+				if (!unloading) {
+					moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
+					pauseCurrentThread(10);
+					moveAllToSeats(peopleArr);
+				} else {
+					allow_queuing();
+					moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
+					moveAllToLocation(new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y));
+				}
 				break;
 			case KeyEvent.VK_W:
 				for (int i = 0; i < peopleArr.size(); i++) {
@@ -230,10 +284,12 @@ public class CS2420_Semester_Project {
 				break;
 
 			case KeyEvent.VK_K:
+				allow_queuing();
 				queueMovementToLocation(peopleArr.get(0), new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
 				queueMovementToLocation(peopleArr.get(0), new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_J:
+				allow_queuing();
 				queueMovementToLocation(peopleArr.get(1), new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
 				queueMovementToLocation(peopleArr.get(1), new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
@@ -250,10 +306,27 @@ public class CS2420_Semester_Project {
 			case KeyEvent.VK_P:
 				moveAllToLocation(new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y));
 				break;
-
 			case KeyEvent.VK_Y:
 				moveAllToSeats(peopleArr);
 				break;
+
+			// Simulate loading/unloading
+			case KeyEvent.VK_1:
+				moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				break;
+			case KeyEvent.VK_2:
+				moveAllToSeats(peopleArr);
+				break;
+			case KeyEvent.VK_3:
+				unloading = true;
+				break;
+			case KeyEvent.VK_4:
+				moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				break;
+			case KeyEvent.VK_5:
+				moveAllToLocation(new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y));
+				break;
+
 
 			case KeyEvent.VK_Q:
 				System.exit(0);
@@ -261,14 +334,7 @@ public class CS2420_Semester_Project {
 			
 			// RESET
 			case KeyEvent.VK_R:
-				int temp = CLOCK_SPEED;
-				CLOCK_SPEED = 1;
-				sleepy(100);
-				CLOCK_SPEED = temp;
-				for (Person person : peopleArr) {
-					person.setX(PERSON_SPAWN_X);
-					person.setY(PERSON_SPAWN_Y);
-				}
+				reset();
 				break;
 			// // Example keybind for letter 'e'
 			// case KeyEvent.VK_E:
@@ -279,9 +345,24 @@ public class CS2420_Semester_Project {
 		}
 	}
 
+	private static void allow_queuing() {
+		display_clock = Display_Clock.RUNNING;
+	}
+	private static void reset() {
+		unloading = false;
+		display_clock = Display_Clock.STOPPED;
+		tickClock.setText("0");
+		ticks = 0;
+		pauseCurrentThread(100);
+		for (Person person : peopleArr) {
+			person.moveToLocationQueue.clear();
+			person.setX(PERSON_SPAWN_X);
+			person.setY(PERSON_SPAWN_Y);
+		}
+	}
+
 	// Stops the process for a certain amount of time, not recommended for timers
-	// Dont use this, it is a bad method, I use it as a reminder
-	public static void sleepy(int milli) {
+	public static void pauseCurrentThread(int milli) {
 		try {
 			Thread.sleep(milli);
 		} catch (InterruptedException penis_hehe) {
@@ -293,4 +374,9 @@ public class CS2420_Semester_Project {
 		Thread thread = new Thread(task);
 		thread.start();
 	}
+}
+
+enum Display_Clock {
+	RUNNING,
+	STOPPED
 }
