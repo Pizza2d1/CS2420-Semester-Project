@@ -60,6 +60,7 @@ public class Person {
     public void setX(int new_x_pos) {
         location.x = new_x_pos;
         updateSprite();
+        // System.out.println("PERSON " + personID + " CHANGED POS TO " + new_x_pos);
         // personSprite.setLocation(new_x_pos, getY());
     }
 
@@ -69,6 +70,7 @@ public class Person {
     public void setY(int new_y_pos) {
         location.y = new_y_pos;
         updateSprite();
+        // System.out.println("PERSON " + personID + " CHANGED POS TO " + new_y_pos);
         // personSprite.setLocation(getX(), new_y_pos);
     }
 
@@ -91,10 +93,10 @@ public class Person {
             return;
             // lockMovementForCollision(peopleArr, getX() + offset, getY());
         }
-        setX(location.x + offset);
+        setX(location.x);
         setColor(Color.GREEN);
         state = State.MOVING;
-        if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", location.x));
+        if (REPORT_MOVEMENT) System.out.println(String.format("Person: %d\nNew X pos: %d\nMoved %d units", personID, location.x, offset));
     }
 
     public void moveY(int offset, List<Person> peopleArr, boolean peopleCollision) {
@@ -104,22 +106,22 @@ public class Person {
         if (peopleCollision && state == State.BLOCKED) {
             return;
         }
-        setY(location.y + offset);
+        setY(location.y);
         setColor(Color.GREEN);
         state = State.MOVING;
-        if (REPORT_MOVEMENT) System.out.println(String.format("Person: " + personID + "\nNew Y pos: %d", location.y));
+        if (REPORT_MOVEMENT) System.out.println(String.format("Person: %d\nNew Y pos: %d\nMoved %d units", personID, location.y, offset));
     }
 
     private boolean checkForCollision(List<Person> peopleArr, Location targetLocation) {
         for (Person other_person : peopleArr) {
-            if (equals(other_person)) break;
+            if (this.equals(other_person)) break;
             if (targetLocation.equals(other_person.location)) {
                 if (REPORT_COLLISIONS) {
                     System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
                     personID, location.x, location.y, other_person.personID, other_person.location.x, other_person.location.y));
                 }
                 setColor(Color.YELLOW);
-                if (state == State.BLOCKED) return false; // Force movement if blocked for more than a tick
+                if (state == State.BLOCKED && other_person.state != State.SEATED) return false; // Force movement if blocked for more than a tick
                 state = State.BLOCKED;
                 return true;
             }

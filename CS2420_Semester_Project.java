@@ -23,12 +23,13 @@ public class CS2420_Semester_Project {
 
 	static Color red = Color.getHSBColor(0, 100, 50);
 
-	static int CLOCK_SPEED = 100;
+	static int CLOCK_SPEED = 300;
 	static List<Person> peopleArr = new ArrayList<>();
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
 	static JLabel tickClock = new JLabel("");
 	static boolean unloading = false;
+	static boolean paused = false;
 	static int ticks = 0;
 	static Display_Clock display_clock = Display_Clock.STOPPED;
 
@@ -88,6 +89,7 @@ public class CS2420_Semester_Project {
 			while (true) {
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > CLOCK_SPEED) {
+					if (paused) continue;
 					System.out.println("tick");
 					startTime = System.currentTimeMillis();
 
@@ -305,7 +307,7 @@ public class CS2420_Semester_Project {
 				moveAllToLocation(new Location(PLANE_GRID_2_X+PERSON_STEP_X*3, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_P:
-				moveAllToLocation(new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y));
+				paused = (paused) ? false : true;
 				break;
 			case KeyEvent.VK_Y:
 				moveAllToSeats(peopleArr);
