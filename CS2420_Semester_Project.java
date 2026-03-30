@@ -52,11 +52,16 @@ public class CS2420_Semester_Project {
 			} catch (Exception err2) {
 			}
 		});
+                
+                List<Integer> queue = PassengerQueue.backToFront();
+                for(Integer i : queue) {
+                    addPerson(i);
+                }
 
 		// Example adding people with seating numbers
-		for (int i = 1; i <= 180; i++) {
-			addPerson(i);
-		}
+		// for (int i = 1; i <= 180; i++) {
+		// 	addPerson(i);
+		// }
 		if (shuffle_people) Collections.shuffle(peopleArr);
 
 		// for (Person person : peopleArr) {
