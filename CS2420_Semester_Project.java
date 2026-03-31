@@ -20,6 +20,7 @@ public class CS2420_Semester_Project {
 	// Testing variables
 	static boolean peopleCollision = true;
 	static boolean shuffle_people = false;
+	static int people_amount = 180;
 
 	static Color red = Color.getHSBColor(0, 100, 50);
 
@@ -28,6 +29,7 @@ public class CS2420_Semester_Project {
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
 	static JLabel tickClock = new JLabel("");
+	static JLabel statsDisplay = new JLabel("");
 	static boolean unloading = false;
 	static boolean paused = false;
 	static int ticks = 0;
@@ -54,7 +56,7 @@ public class CS2420_Semester_Project {
 		});
 
 		// Example adding people with seating numbers
-		for (int i = 1; i <= 180; i++) {
+		for (int i = 1; i <= people_amount; i++) {
 			addPerson(i);
 		}
 		if (shuffle_people) Collections.shuffle(peopleArr);
@@ -69,6 +71,8 @@ public class CS2420_Semester_Project {
 
 		// Add display clock to show amount of ticks that the simulation takes
 		displayClock();
+
+		statsDisplay();
 	}
 
 	private static void addPerson(int seatingNumber) {
@@ -105,6 +109,7 @@ public class CS2420_Semester_Project {
 						ticks++;
 					}
 					tickClock.setText(String.valueOf(ticks));
+					updateStats();
 				}
 			}
 		};
@@ -117,6 +122,23 @@ public class CS2420_Semester_Project {
 		tickClock.setLocation(PERSON_SPAWN_X-50, 30);
 		tickClock.setSize(100, 100);
 		contentPane.add(tickClock);
+	}
+
+	private static void statsDisplay() {
+		statsDisplay.setFont(new Font("Arial", Font.PLAIN, 10));
+		statsDisplay.setOpaque(true);
+		statsDisplay.setLocation(PERSON_SPAWN_X-50, 200);
+		statsDisplay.setSize(200, 100);
+		contentPane.add(statsDisplay);
+	}
+	private static void updateStats() {
+		statsDisplay.setText(
+			"People Collision: " + peopleCollision + "\n" +
+			"Shuffle people: " + shuffle_people + "\n" +
+			"Amount of people: " + people_amount + "\n" +
+			"Clock speed (milis before tick): " + CLOCK_SPEED + "\n" +
+			"Unloading: " + unloading
+		);
 	}
 
 	private static void moveAllToLocation(Location targetLocation) {
