@@ -127,17 +127,18 @@ public class CS2420_Semester_Project {
 	private static void statsDisplay() {
 		statsDisplay.setFont(new Font("Arial", Font.PLAIN, 10));
 		statsDisplay.setOpaque(true);
-		statsDisplay.setLocation(PERSON_SPAWN_X-50, 200);
+		statsDisplay.setLocation(PERSON_SPAWN_X-80, 200);
 		statsDisplay.setSize(200, 100);
 		contentPane.add(statsDisplay);
 	}
 	private static void updateStats() {
 		statsDisplay.setText(
-			"People Collision: " + peopleCollision + "\n" +
-			"Shuffle people: " + shuffle_people + "\n" +
-			"Amount of people: " + people_amount + "\n" +
-			"Clock speed (milis before tick): " + CLOCK_SPEED + "\n" +
-			"Unloading: " + unloading
+			"<html>People Collision: " + peopleCollision + "<br>" +
+			"Shuffle people: " + shuffle_people + "<br>" +
+			"Amount of people: " + people_amount + "<br>" +
+			"Clock speed: " + CLOCK_SPEED + "<br>" +
+			"Paused: " + paused + "<br>" +
+			"Unloading: " + unloading + "</html>"
 		);
 	}
 
@@ -343,7 +344,7 @@ public class CS2420_Semester_Project {
 				moveAllToSeats(peopleArr);
 				break;
 			case KeyEvent.VK_3:
-				unloading = true;
+				unloading = (unloading) ? false : true;
 				break;
 			case KeyEvent.VK_4:
 				moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));

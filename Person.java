@@ -7,10 +7,6 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
-/*
-* A record is the same as a class, it just automatically has the getters
-* and setters for personID and personSprite, clean code
-*/
 public class Person {
 
     // Testing variables
