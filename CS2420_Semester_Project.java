@@ -8,10 +8,15 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -55,10 +60,13 @@ public class CS2420_Semester_Project {
 			}
 		});
 
-		// Example adding people with seating numbers
-		for (int i = 1; i <= people_amount; i++) {
+		// Decide what queue to use
+		List<Integer> queue = PassengerQueue.backToFront();
+		for (Integer i : queue) {
 			addPerson(i);
 		}
+
+		// If shuffle option is on, then shuffle people at start
 		if (shuffle_people) Collections.shuffle(peopleArr);
 
 		// for (Person person : peopleArr) {
@@ -67,11 +75,14 @@ public class CS2420_Semester_Project {
 		// 	System.out.println("SEAT Y: " + person.getSeaty);
 		// }
 
+		// getSimSettings();
+
+		// Heart of the program, will run at a certain clock speed that can be changed at runtime, all movement and gui elements rely on it
 		mainClock();
 
 		// Add display clock to show amount of ticks that the simulation takes
 		displayClock();
-
+		// Add a way to display the current stats so that they can be debugged in real time
 		statsDisplay();
 	}
 
@@ -94,7 +105,6 @@ public class CS2420_Semester_Project {
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > CLOCK_SPEED) {
 					if (paused) continue;
-					System.out.println("tick");
 					startTime = System.currentTimeMillis();
 
 					// Actions per tick happen here vvv
@@ -108,6 +118,7 @@ public class CS2420_Semester_Project {
 						}
 						ticks++;
 					}
+					System.out.println("tick");
 					tickClock.setText(String.valueOf(ticks));
 					updateStats();
 				}
@@ -399,6 +410,23 @@ public class CS2420_Semester_Project {
 	private static void startThread(Runnable task) {
 		Thread thread = new Thread(task);
 		thread.start();
+	}
+
+	private static List<String> getSimSettings() { // I obviously ripped this from stackOverflow
+		ArrayList<String> result = new ArrayList<>();
+		InputStream input = CS2420_Semester_Project.class.getResourceAsStream("config.txt");
+		if (input != null) {
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
+				String line;
+				while ((line = reader.readLine()) != null) {
+					result.add(line);
+					// System.out.println(line);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
 	}
 }
 
