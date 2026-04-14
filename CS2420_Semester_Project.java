@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -24,8 +23,8 @@ public class CS2420_Semester_Project {
 
 	// Testing variables
 	static boolean peopleCollision = true;
-	static boolean shuffle_people = false;
-	static int people_amount = 180;
+	static Sort_Type queueType = Sort_Type.GROUPS_12;
+	public static int people_amount = 180;
 
 	static Color red = Color.getHSBColor(0, 100, 50);
 
@@ -39,6 +38,7 @@ public class CS2420_Semester_Project {
 	static boolean paused = false;
 	static int ticks = 0;
 	static Display_Clock display_clock = Display_Clock.STOPPED;
+	static List<Integer> queue = new ArrayList<>();
 
 	public static void main(String[] args) {
 		// Starts up the gui and keybinds
@@ -60,20 +60,36 @@ public class CS2420_Semester_Project {
 			}
 		});
 
-		// Decide what queue to use
-		List<Integer> queue = PassengerQueue.backToFront();
-		for (Integer i : queue) {
+		// Create people array so that they can be sorted
+		for (int i = 1; i <= people_amount; i++) {
 			addPerson(i);
 		}
 
-		// If shuffle option is on, then shuffle people at start
-		if (shuffle_people) Collections.shuffle(peopleArr);
+		// Decide what queue to use
+		// Sort the people in whatever way you want
+		PassengerQueue.random(peopleArr);
+		switch (queueType) {
+			case RANDOM:
+				peopleArr = PassengerQueue.random(peopleArr); break;
+			case BACK_TO_FRONT:
+				peopleArr = PassengerQueue.backToFront(peopleArr); break;
+			case FRONT_TO_BACK:
+				peopleArr = PassengerQueue.frontToBack(peopleArr); break;
+			case GROUPS_6:
+				peopleArr = PassengerQueue.groupsOf6(peopleArr); break;
+			case GROUPS_12:
+				peopleArr = PassengerQueue.groupsOf12(peopleArr); break;
+			case GROUPS_18:
+				peopleArr = PassengerQueue.groupsOf18(peopleArr); break;
+			default:
+				break;
+		}
 
-		// for (Person person : peopleArr) {
-		// 	System.out.println("PERSON ID: " + person.personID);
-		// 	System.out.println("SEAT X: " + person.getSeatx);
-		// 	System.out.println("SEAT Y: " + person.getSeaty);
-		// }
+		for (Person person : peopleArr) {
+			System.out.println("PERSON ID: " + person.personID);
+			System.out.println("SEAT X: " + person.getSeatX());
+			System.out.println("SEAT Y: " + person.getSeatY());
+		}
 
 		// getSimSettings();
 
@@ -86,7 +102,7 @@ public class CS2420_Semester_Project {
 		statsDisplay();
 	}
 
-	private static void addPerson(int seatingNumber) {
+	public static void addPerson(int seatingNumber) {
 		JLabel personSprite = new JLabel(String.valueOf(seatingNumber));
 		personSprite.setFont(new Font("Arial", Font.PLAIN, 8));
 		personSprite.setOpaque(true);
@@ -145,10 +161,11 @@ public class CS2420_Semester_Project {
 	private static void updateStats() {
 		statsDisplay.setText(
 			"<html>People Collision: " + peopleCollision + "<br>" +
-			"Shuffle people: " + shuffle_people + "<br>" +
+			"Queue type: " + queueType + "<br>" +
 			"Amount of people: " + people_amount + "<br>" +
 			"Clock speed: " + CLOCK_SPEED + "<br>" +
 			"Paused: " + paused + "<br>" +
+			//"Little shit: " + display_clock + "<br>" +
 			"Unloading: " + unloading + "</html>"
 		);
 	}
@@ -270,7 +287,7 @@ public class CS2420_Semester_Project {
 				continue;
 			}
 		}
-		display_clock = Display_Clock.STOPPED;
+		paused = true;
 		return true;
 	}
 
@@ -356,6 +373,7 @@ public class CS2420_Semester_Project {
 				break;
 			case KeyEvent.VK_3:
 				unloading = (unloading) ? false : true;
+				paused = false;
 				break;
 			case KeyEvent.VK_4:
 				moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
@@ -433,4 +451,13 @@ public class CS2420_Semester_Project {
 enum Display_Clock {
 	RUNNING,
 	STOPPED
+}
+
+enum Sort_Type {
+	RANDOM,
+	BACK_TO_FRONT,
+	FRONT_TO_BACK,
+	GROUPS_6,
+	GROUPS_12,
+	GROUPS_18
 }

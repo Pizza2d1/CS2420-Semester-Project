@@ -117,7 +117,13 @@ public class Person {
                     personID, location.x, location.y, other_person.personID, other_person.location.x, other_person.location.y));
                 }
                 setColor(Color.YELLOW);
-                if (state == State.BLOCKED && other_person.state != State.SEATED) return false; // Force movement if blocked for more than a tick
+                if (state == State.BLOCKED && other_person.state != State.SEATED) {
+                    if (location.x != targetLocation.x) {
+                        return false; // Force movement if blocked for more than a tick when trying to get into seat
+                    } else {
+                        return true;
+                    }
+                }
                 state = State.BLOCKED;
                 return true;
             }
