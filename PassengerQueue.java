@@ -21,7 +21,6 @@ public class PassengerQueue<T> {
                 queueOrder[count]=(i * 6 + j);
                 count++;
             }
-
             for (int k = 6; k >= 4; k--) {
                 queueOrder[count]=(i * 6 + k);
                 count++;
@@ -40,8 +39,8 @@ public class PassengerQueue<T> {
         for (int i = 0; i < people_amount; i++) {
             queueOrder[i] = i;
         }
-        for (int i : queueOrder) System.out.println(i);
-        for (Person person : queue) System.out.println(person.personID);
+        // for (int i : queueOrder) System.out.println(i);
+        // for (Person person : queue) System.out.println(person.personID);
         return sortPeopleArr(queue, queueOrder);
     }
 

@@ -7,10 +7,14 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+/**
+ * @author Pizza2d1
+ */
+
 public class Person {
 
     // Testing variables
-    private static final boolean REPORT_MOVEMENT = true;
+    private static final boolean REPORT_MOVEMENT = false;
     private static final boolean REPORT_COLLISIONS = false;
 
     // Make sure it follows the person png size
@@ -42,11 +46,13 @@ public class Person {
     }
     
     public int getSeatX() {
-        int seatingID = personID-1;
+        // int seatingID = personID-1;
+        int seatingID = personID;
         return (seatingID % 3) * PERSON_STEP_X + ((seatingID % 6 < 3) ? PLANE_GRID_1_X : PLANE_GRID_2_X);
     }
     public int getSeatY() {
-        int seatingID = personID-1;
+        // int seatingID = personID-1;
+        int seatingID = personID;
         return (seatingID / 6) * PERSON_STEP_Y + PLANE_GRID_1_Y;
     }
 
