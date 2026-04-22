@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 public class CS2420_Semester_Project {
 
 	// Testing variables
-	static boolean peopleCollision = true;
+	static boolean peopleCollision = false;
 	static boolean shuffle_people = false;
 	static int people_amount = 180;
 
