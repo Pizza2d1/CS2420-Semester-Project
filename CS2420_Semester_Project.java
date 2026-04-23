@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -23,24 +22,35 @@ import javax.swing.JPanel;
 public class CS2420_Semester_Project {
 
 	// Testing variables
-	static boolean peopleCollision = false;
-	static boolean shuffle_people = false;
-	static int people_amount = 180;
+	static boolean peopleCollision;
+	static Sort_Type queueType;
+	public static int people_amount;
+	static int clockSpeed;
+
+	// REPLACED BY CONFIG FILE
+	// static boolean peopleCollision = true;
+	// static Sort_Type queueType = Sort_Type.FRONT_TO_BACK;
+	// public static int people_amount = 180;
+	// static int clockSpeed = 300;
 
 	static Color red = Color.getHSBColor(0, 100, 50);
 
-	static int CLOCK_SPEED = 300;
 	static List<Person> peopleArr = new ArrayList<>();
 	static JPanel contentPane = new JPanel();
 	static JLabel planeDisplay = new JLabel();
 	static JLabel tickClock = new JLabel("");
 	static JLabel statsDisplay = new JLabel("");
 	static boolean unloading = false;
+	static boolean load_complete = false;
 	static boolean paused = false;
 	static int ticks = 0;
 	static Display_Clock display_clock = Display_Clock.STOPPED;
+	static List<Integer> queue = new ArrayList<>();
 
 	public static void main(String[] args) {
+
+		getSimSettings(); // Required (unless we decide to remove it)
+
 		// Starts up the gui and keybinds
 		EventQueue.invokeLater(() -> {
 			try {
@@ -52,30 +62,44 @@ public class CS2420_Semester_Project {
 						int keyCode = e.getKeyCode();
 						try { // Two try/catch statements? Ewwww
 							action(keyCode);
-						} catch (IOException err) {
-						}
+						} catch (IOException err) {}
 					}
 				});
-			} catch (Exception err2) {
-			}
+			} catch (Exception err2) {}
 		});
 
-		// Decide what queue to use
-		List<Integer> queue = PassengerQueue.backToFront();
-		for (Integer i : queue) {
+		// Create people array so that they can be sorted
+		for (int i = 0; i < people_amount; i++) {
 			addPerson(i);
 		}
 
-		// If shuffle option is on, then shuffle people at start
-		if (shuffle_people) Collections.shuffle(peopleArr);
+		// Decide what queue to use
+		PassengerQueue.random(peopleArr);
+		switch (queueType) {
+			case RANDOM:
+				peopleArr = PassengerQueue.random(peopleArr); break;
+			case BACK_TO_FRONT:
+				peopleArr = PassengerQueue.backToFront(peopleArr); break;
+			case FRONT_TO_BACK:
+				System.out.println("before");
+				peopleArr = PassengerQueue.frontToBack(peopleArr);
+				System.out.println("after");
+				break;
+			case GROUPS_6:
+				peopleArr = PassengerQueue.groupsOf6(peopleArr); break;
+			case GROUPS_12:
+				peopleArr = PassengerQueue.groupsOf12(peopleArr); break;
+			case GROUPS_18:
+				peopleArr = PassengerQueue.groupsOf18(peopleArr); break;
+			default:
+				break;
+		}
 
 		// for (Person person : peopleArr) {
-		// 	System.out.println("PERSON ID: " + person.personID);
-		// 	System.out.println("SEAT X: " + person.getSeatx);
-		// 	System.out.println("SEAT Y: " + person.getSeaty);
+			// System.out.println("PERSON ID: " + person.personID);
+			// System.out.println("SEAT X: " + person.getSeatX());
+			// System.out.println("SEAT Y: " + person.getSeatY());
 		// }
-
-		// getSimSettings();
 
 		// Heart of the program, will run at a certain clock speed that can be changed at runtime, all movement and gui elements rely on it
 		mainClock();
@@ -86,7 +110,7 @@ public class CS2420_Semester_Project {
 		statsDisplay();
 	}
 
-	private static void addPerson(int seatingNumber) {
+	public static void addPerson(int seatingNumber) {
 		JLabel personSprite = new JLabel(String.valueOf(seatingNumber));
 		personSprite.setFont(new Font("Arial", Font.PLAIN, 8));
 		personSprite.setOpaque(true);
@@ -103,18 +127,18 @@ public class CS2420_Semester_Project {
 			long startTime = System.currentTimeMillis();
 			while (true) {
 				long tempTime = System.currentTimeMillis();
-				if (tempTime - startTime > CLOCK_SPEED) {
+				if (tempTime - startTime > clockSpeed) {
 					if (paused) continue;
 					startTime = System.currentTimeMillis();
 
 					// Actions per tick happen here vvv
 
-					if (checkIfAllSeated()) unloading = true;
 					if (display_clock == Display_Clock.RUNNING) {
 						if (unloading) {
 							movePeopleHorizontalPriority();
 						} else {
 							movePeopleVerticalPriority();
+							checkIfAllSeated();
 						}
 						ticks++;
 					}
@@ -145,9 +169,9 @@ public class CS2420_Semester_Project {
 	private static void updateStats() {
 		statsDisplay.setText(
 			"<html>People Collision: " + peopleCollision + "<br>" +
-			"Shuffle people: " + shuffle_people + "<br>" +
+			"Queue type: " + queueType + "<br>" +
 			"Amount of people: " + people_amount + "<br>" +
-			"Clock speed: " + CLOCK_SPEED + "<br>" +
+			"Clock speed: " + clockSpeed + "<br>" +
 			"Paused: " + paused + "<br>" +
 			"Unloading: " + unloading + "</html>"
 		);
@@ -155,13 +179,14 @@ public class CS2420_Semester_Project {
 
 	private static void moveAllToLocation(Location targetLocation) {
 		allow_queuing();
+		paused = false;
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
 			int personCount = 0;
 			while (true) {
 				if (display_clock == Display_Clock.STOPPED) break;
 				long tempTime = System.currentTimeMillis();
-				if (tempTime - startTime > CLOCK_SPEED) {
+				if (tempTime - startTime > clockSpeed) {
 					if (personCount == peopleArr.size()) break;
 					queueMovementToLocation(peopleArr.get(personCount), targetLocation);
 					startTime = System.currentTimeMillis();
@@ -175,13 +200,14 @@ public class CS2420_Semester_Project {
 
 	private static void moveAllToSeats(List<Person> people) {
 		allow_queuing();
+		paused = false;
 		Runnable task = () -> {
 			long startTime = System.currentTimeMillis();
 			int personCount = 0;
 			while (true) {
 				if (display_clock == Display_Clock.STOPPED) break;
 				long tempTime = System.currentTimeMillis();
-				if (tempTime - startTime > CLOCK_SPEED) {
+				if (tempTime - startTime > clockSpeed) {
 					if (personCount == people.size())
 						break;
 					Location targetLocation = new Location(people.get(personCount).seatLocation.x, people.get(personCount).seatLocation.y);
@@ -270,7 +296,8 @@ public class CS2420_Semester_Project {
 				continue;
 			}
 		}
-		display_clock = Display_Clock.STOPPED;
+//		paused = true;
+		load_complete = true;
 		return true;
 	}
 
@@ -314,10 +341,10 @@ public class CS2420_Semester_Project {
 				break;
 
 			case KeyEvent.VK_COMMA:
-				CLOCK_SPEED-=100;
+				clockSpeed-=100;
 				break;
 			case KeyEvent.VK_PERIOD:
-				CLOCK_SPEED+=100;
+				clockSpeed+=100;
 				break;
 
 			case KeyEvent.VK_K:
@@ -356,12 +383,43 @@ public class CS2420_Semester_Project {
 				break;
 			case KeyEvent.VK_3:
 				unloading = (unloading) ? false : true;
+				paused = false;
 				break;
 			case KeyEvent.VK_4:
 				moveAllToLocation(new Location(PLANE_GRID_2_X-PERSON_STEP_X*2, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_5:
 				moveAllToLocation(new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y));
+				break;
+			case KeyEvent.VK_6:
+				switch (queueType) {
+					case RANDOM:
+						peopleArr = PassengerQueue.backToFront(peopleArr); 
+						queueType = Sort_Type.BACK_TO_FRONT;
+						break;
+					case BACK_TO_FRONT:
+						peopleArr = PassengerQueue.frontToBack(peopleArr);
+						queueType = Sort_Type.FRONT_TO_BACK;
+						break;
+					case FRONT_TO_BACK:
+						peopleArr = PassengerQueue.groupsOf6(peopleArr);
+						queueType = Sort_Type.GROUPS_6;
+						break;
+					case GROUPS_6:
+						peopleArr = PassengerQueue.groupsOf12(peopleArr);
+						queueType = Sort_Type.GROUPS_12;
+						break;
+					case GROUPS_12:
+						peopleArr = PassengerQueue.groupsOf18(peopleArr);
+						queueType = Sort_Type.GROUPS_18;
+						break;
+					case GROUPS_18:
+						peopleArr = PassengerQueue.random(peopleArr);
+						queueType = Sort_Type.RANDOM;
+						break;
+					default:
+						break;
+				}
 				break;
 
 
@@ -387,6 +445,7 @@ public class CS2420_Semester_Project {
 	}
 	private static void reset() {
 		unloading = false;
+		load_complete = false;
 		display_clock = Display_Clock.STOPPED;
 		tickClock.setText("0");
 		ticks = 0;
@@ -412,25 +471,68 @@ public class CS2420_Semester_Project {
 		thread.start();
 	}
 
-	private static List<String> getSimSettings() { // I obviously ripped this from stackOverflow
-		ArrayList<String> result = new ArrayList<>();
+	private static void getSimSettings() { // I obviously ripped this from stackOverflow
+		String[] result = new String[16]; // ERROR POINT
 		InputStream input = CS2420_Semester_Project.class.getResourceAsStream("config.txt");
-		if (input != null) {
-			try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
-				String line;
-				while ((line = reader.readLine()) != null) {
-					result.add(line);
-					// System.out.println(line);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8))) {
+			String line;
+			boolean second_line_checker = false;
+			while ((line = reader.readLine()) != null) {
+				if (second_line_checker) addToArr(result, line);
+				second_line_checker = (second_line_checker) ? false : true;
 			}
+		} catch (IOException e) {
+			System.out.println("Config file not found in src/CS2420_Semester_Project directory");
+			e.printStackTrace();
 		}
-		return result;
+
+		// Malleable part vvv
+		peopleCollision = getBoolVal(result, Config_Names.PEOPLE_COLLISION.getValue());
+		queueType = Sort_Type.fromvalue(getIntVal(result, Config_Names.QUEUE_TYPE.getValue()));
+		people_amount = getIntVal(result, Config_Names.PEOPLE_AMOUNT.getValue());
+		clockSpeed = getIntVal(result, Config_Names.CLOCK_SPEED.getValue());
+	}
+	private static boolean getBoolVal(String[] arr, int placement) {
+		return arr[placement] != null && Boolean.parseBoolean(arr[placement]);
+	}
+	private static int getIntVal(String[] arr, int placement) {
+		return (arr[placement] != null) ? Integer.parseInt(arr[placement]) : 0;
+	}
+	private static void addToArr(String[] arr, String value) {
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] == null)  { arr[i] = value;	break; }
+		}
 	}
 }
 
 enum Display_Clock {
 	RUNNING,
 	STOPPED
+}
+
+enum Sort_Type {
+	RANDOM(0),
+	BACK_TO_FRONT(1),
+	FRONT_TO_BACK(2),
+	GROUPS_6(3),
+	GROUPS_12(4),
+	GROUPS_18(5);
+
+	private final int value; // Super compact code time!
+    Sort_Type(int value) { this.value = value; }
+    public int getvalue() { return value; }
+	public static Sort_Type fromvalue(int value) {
+		for (Sort_Type s : Sort_Type.values()) {if (s.value == value) return s;}
+		throw new IllegalArgumentException("Invalid code");
+	}
+}
+enum Config_Names {
+	PEOPLE_COLLISION(0),
+	QUEUE_TYPE(1),
+	PEOPLE_AMOUNT(2),
+	CLOCK_SPEED(3);
+
+    private final int value;
+    Config_Names(int value) { this.value = value; }
+    public int getValue() { return value; }
 }

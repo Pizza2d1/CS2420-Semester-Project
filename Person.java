@@ -7,10 +7,14 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+/**
+ * @author Pizza2d1
+ */
+
 public class Person {
 
     // Testing variables
-    private static final boolean REPORT_MOVEMENT = true;
+    private static final boolean REPORT_MOVEMENT = false;
     private static final boolean REPORT_COLLISIONS = false;
 
     // Make sure it follows the person png size
@@ -42,11 +46,13 @@ public class Person {
     }
     
     public int getSeatX() {
-        int seatingID = personID-1;
+        // int seatingID = personID-1;
+        int seatingID = personID;
         return (seatingID % 3) * PERSON_STEP_X + ((seatingID % 6 < 3) ? PLANE_GRID_1_X : PLANE_GRID_2_X);
     }
     public int getSeatY() {
-        int seatingID = personID-1;
+        // int seatingID = personID-1;
+        int seatingID = personID;
         return (seatingID / 6) * PERSON_STEP_Y + PLANE_GRID_1_Y;
     }
 
@@ -117,7 +123,13 @@ public class Person {
                     personID, location.x, location.y, other_person.personID, other_person.location.x, other_person.location.y));
                 }
                 setColor(Color.YELLOW);
-                if (state == State.BLOCKED && other_person.state != State.SEATED) return false; // Force movement if blocked for more than a tick
+                if (state == State.BLOCKED && other_person.state != State.SEATED) {
+                    if (location.x != targetLocation.x) {
+                        return false; // Force movement if blocked for more than a tick when trying to get into seat
+                    } else {
+                        return true;
+                    }
+                }
                 state = State.BLOCKED;
                 return true;
             }

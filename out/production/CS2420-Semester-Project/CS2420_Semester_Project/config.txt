@@ -1,0 +1,16 @@
+# People collision
+1
+# Starting queue type (0: RANDOM, 1: BACK_TO_FRONT, 2: FRONT_TO_BACK, 3: GROUPS_OF_6, 4: GROUPS_OF_12, 5: GROUPS_OF_18)
+1
+# People amount
+180
+# Clock speed (ms)
+300
+# WINDOW_X     THESE NEXT 4 AREN'T WORKING YET
+100
+# WINDOW_Y
+100
+# WINDOW_HEIGHT
+1000
+# WINDOW_WIDTH
+800
