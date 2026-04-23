@@ -2,12 +2,9 @@ package CS2420_Semester_Project;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -23,7 +20,8 @@ import javax.swing.border.EmptyBorder;
 public class PlaneGui extends JFrame {
 
 	// For Jframe shenanigans
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 	
 	// Customizable
 	final static int WINDOW_X = 100;
@@ -48,7 +46,7 @@ public class PlaneGui extends JFrame {
 	final static int PLANE_GRID_2_Y = 188;
 
 
-	public PlaneGui(List<Person> peopleArr, JLabel planeDisplay, JPanel contentPane) {
+	public PlaneGui(JLabel planeDisplay, JPanel contentPane) {
 		// getSimSettings();
 		// System.out.println(WINDOW_X);
 		// System.out.println(WINDOW_Y);
@@ -60,7 +58,7 @@ public class PlaneGui extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		planeDisplay.setSize(PLANE_WIDTH, PLANE_HEIGHT);
-		planeDisplay.setIcon(new ImageIcon(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/plane_outline-test2.png")));
+		planeDisplay.setIcon(new ImageIcon(Objects.requireNonNull(CS2420_Semester_Project.class.getResource("/CS2420_Semester_Project/sprites/plane_outline-test2.png"))));
 
 		JPanel GridPanel1 = new JPanel();
 		GridPanel1.setBounds(PLANE_GRID_1_X-5, PLANE_GRID_1_Y-12, 50, 700);
