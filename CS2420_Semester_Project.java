@@ -1,8 +1,7 @@
 package CS2420_Semester_Project;
 
 // For player constants
-import CS2420_Semester_Project.subclasses.Location;
-import CS2420_Semester_Project.subclasses.PersonState;
+import CS2420_Semester_Project.subclasses.*;
 
 import static CS2420_Semester_Project.Person.*;
 import static CS2420_Semester_Project.PlaneGui.*;
@@ -496,9 +495,8 @@ public class CS2420_Semester_Project {
 				if (second_line_checker) addToArr(result, line);
 				second_line_checker = !second_line_checker;
 			}
-		} catch (IOException e) {
+		} catch (IOException _) {
 			System.out.println("Config file not found in src/CS2420_Semester_Project directory");
-			e.printStackTrace();
 		}
 
 		// Malleable part vvv
@@ -518,36 +516,4 @@ public class CS2420_Semester_Project {
 			if (arr[i] == null)  { arr[i] = value;	break; }
 		}
 	}
-}
-
-enum Display_Clock {
-	RUNNING,
-	STOPPED
-}
-
-enum Sort_Type {
-	RANDOM(0),
-	BACK_TO_FRONT(1),
-	FRONT_TO_BACK(2),
-	GROUPS_6(3),
-	GROUPS_12(4),
-	GROUPS_18(5);
-
-	private final int value; // Super compact code time!
-    Sort_Type(int value) { this.value = value; }
-    public int getvalue() { return value; }
-	public static Sort_Type fromvalue(int value) {
-		for (Sort_Type s : Sort_Type.values()) {if (s.value == value) return s;}
-		throw new IllegalArgumentException("Invalid code");
-	}
-}
-enum Config_Names {
-	PEOPLE_COLLISION(0),
-	QUEUE_TYPE(1),
-	PEOPLE_AMOUNT(2),
-	CLOCK_SPEED(3);
-
-    private final int value;
-    Config_Names(int value) { this.value = value; }
-    public int getValue() { return value; }
 }
