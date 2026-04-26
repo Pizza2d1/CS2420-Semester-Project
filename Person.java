@@ -1,5 +1,8 @@
 package CS2420_Semester_Project;
 
+import CS2420_Semester_Project.subclasses.Location;
+import CS2420_Semester_Project.subclasses.PersonState;
+
 import static CS2420_Semester_Project.PlaneGui.*;
 
 import java.awt.Color;
@@ -30,11 +33,11 @@ public class Person {
     public boolean isMoving;
     public JLabel personSprite;
     public List<Location> moveToLocationQueue;
-    public State state;
+    public PersonState state;
     public Location location;
     public Location seatLocation = new Location(0, 0);
 
-    public Person(int personID, boolean isMoving, JLabel personSprite, Location location, List<Location> moveToLocationQueue, State state) {
+    public Person(int personID, boolean isMoving, JLabel personSprite, Location location, List<Location> moveToLocationQueue, PersonState state) {
         this.personID = personID;
         this.isMoving = isMoving;
         this.personSprite = personSprite;
@@ -78,12 +81,12 @@ public class Person {
 
     public void moveX(int offset) {
         setX(location.x + offset);
-        if (REPORT_MOVEMENT) System.out.println(String.format("New X pos: %d", location.x));
+        if (REPORT_MOVEMENT) System.out.printf("New X pos: %d%n", location.x);
     }
 
     public void moveY(int offset) {
         setY(location.y + offset);
-        if (REPORT_MOVEMENT) System.out.println(String.format("New Y pos: %d", location.y));
+        if (REPORT_MOVEMENT) System.out.printf("New Y pos: %d%n", location.y);
     }
 
     // Collision checking movements
@@ -91,27 +94,27 @@ public class Person {
         Location targetLocation = location;
         targetLocation.x+=offset;
         checkForCollision(peopleArr, targetLocation);
-        if (peopleCollision && state == State.BLOCKED) {
+        if (peopleCollision && state == PersonState.BLOCKED) {
             return;
             // lockMovementForCollision(peopleArr, getX() + offset, getY());
         }
         setX(location.x);
         setColor(Color.GREEN);
-        state = State.MOVING;
-        if (REPORT_MOVEMENT) System.out.println(String.format("Person: %d\nNew X pos: %d\nMoved %d units", personID, location.x, offset));
+        state = PersonState.MOVING;
+        if (REPORT_MOVEMENT) System.out.printf("Person: %d\nNew X pos: %d\nMoved %d units%n", personID, location.x, offset);
     }
 
     public void moveY(int offset, List<Person> peopleArr, boolean peopleCollision) {
         Location targetLocation = location;
         targetLocation.y+=offset;
         checkForCollision(peopleArr, targetLocation);
-        if (peopleCollision && state == State.BLOCKED) {
+        if (peopleCollision && state == PersonState.BLOCKED) {
             return;
         }
         setY(location.y);
         setColor(Color.GREEN);
-        state = State.MOVING;
-        if (REPORT_MOVEMENT) System.out.println(String.format("Person: %d\nNew Y pos: %d\nMoved %d units", personID, location.y, offset));
+        state = PersonState.MOVING;
+        if (REPORT_MOVEMENT) System.out.printf("Person: %d\nNew Y pos: %d\nMoved %d units%n", personID, location.y, offset);
     }
 
     private boolean checkForCollision(List<Person> peopleArr, Location targetLocation) {
@@ -119,10 +122,11 @@ public class Person {
             if (this.equals(other_person)) break;
             if (targetLocation.equals(other_person.location)) {
                 if (REPORT_COLLISIONS) {
-                    System.out.println(String.format("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n",
-                    personID, location.x, location.y, other_person.personID, other_person.location.x, other_person.location.y));
+                    System.out.printf("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n%n",
+                    personID, location.x, location.y, other_person.personID, other_person.location.x, other_person.location.y);
                 }
                 setColor(Color.YELLOW);
+<<<<<<< HEAD
                 if (state == State.BLOCKED && other_person.state != State.SEATED) {
                     if (location.x != targetLocation.x) {
                         return false; // Force movement if blocked for more than a tick when trying to get into seat
@@ -131,10 +135,16 @@ public class Person {
                     }
                 }
                 state = State.BLOCKED;
+=======
+                if (state == PersonState.BLOCKED && other_person.state != PersonState.SEATED) {
+                    return location.x == targetLocation.x; // Force movement if blocked for more than a tick when trying to get into seat
+                }
+                state = PersonState.BLOCKED;
+>>>>>>> main
                 return true;
             }
         }
-        state = State.MOVING;
+        state = PersonState.MOVING;
         return false;
     }
 
@@ -145,43 +155,6 @@ public class Person {
         personSprite.setBackground(newColor);
         personSprite.repaint();;
     }
-}
-
-
-// Couldn't use java record because they are immutable, big sad
-class Location {
-   	public int x;
-   	public int y;
-	public Location(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-    
-    @Override
-    public String toString() {
-      return "X: " + x + " Y: " + y;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-
-        if (obj == null
-            || this.getClass() != obj.getClass())
-            return false;
-
-        Location p1 = (Location)obj;
-
-        return this.x == p1.x
-            && this.y == p1.y;
-    }
-}
-
-enum State {
-    BLOCKED,
-    MOVING,
-    SEATED
 }
 
 

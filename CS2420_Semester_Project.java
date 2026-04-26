@@ -1,6 +1,8 @@
 package CS2420_Semester_Project;
 
 // For player constants
+import CS2420_Semester_Project.subclasses.*;
+
 import static CS2420_Semester_Project.Person.*;
 import static CS2420_Semester_Project.PlaneGui.*;
 import java.awt.Color;
@@ -19,6 +21,10 @@ import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * @author Cory
+ * @author Pizza2d1
+ */
 public class CS2420_Semester_Project {
 
 	// Testing variables
@@ -41,10 +47,11 @@ public class CS2420_Semester_Project {
 	static JLabel tickClock = new JLabel("");
 	static JLabel statsDisplay = new JLabel("");
 	static boolean unloading = false;
+	static boolean load_complete = false;
 	static boolean paused = false;
 	static int ticks = 0;
 	static Display_Clock display_clock = Display_Clock.STOPPED;
-	static List<Integer> queue = new ArrayList<>();
+//	static List<Integer> queue = new ArrayList<>();
 
 	public static void main(String[] args) {
 
@@ -53,7 +60,7 @@ public class CS2420_Semester_Project {
 		// Starts up the gui and keybinds
 		EventQueue.invokeLater(() -> {
 			try {
-				PlaneGui frame = new PlaneGui(peopleArr, planeDisplay, contentPane); // Can prob make this section shorter, but whatever
+				PlaneGui frame = new PlaneGui(planeDisplay, contentPane); // Can prob make this section shorter, but whatever
 				frame.setVisible(true);
 				frame.addKeyListener(new KeyAdapter() {
           			@Override
@@ -61,10 +68,10 @@ public class CS2420_Semester_Project {
 						int keyCode = e.getKeyCode();
 						try { // Two try/catch statements? Ewwww
 							action(keyCode);
-						} catch (IOException err) {}
+						} catch (IOException _) {}
 					}
 				});
-			} catch (Exception err2) {}
+			} catch (Exception _) {}
 		});
 
 		// Create people array so that they can be sorted
@@ -116,7 +123,7 @@ public class CS2420_Semester_Project {
 		personSprite.setBackground(red);
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-		Person test = new Person(seatingNumber, false, personSprite, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), new ArrayList<>(), State.MOVING);
+		Person test = new Person(seatingNumber, false, personSprite, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), new ArrayList<>(), PersonState.MOVING);
 		peopleArr.add(test);
 		contentPane.add(test.personSprite);
 	}
@@ -132,12 +139,12 @@ public class CS2420_Semester_Project {
 
 					// Actions per tick happen here vvv
 
-					if (checkIfAllSeated()) unloading = true;
 					if (display_clock == Display_Clock.RUNNING) {
 						if (unloading) {
 							movePeopleHorizontalPriority();
 						} else {
 							movePeopleVerticalPriority();
+							checkIfAllSeated();
 						}
 						ticks++;
 					}
@@ -281,7 +288,7 @@ public class CS2420_Semester_Project {
 
 	public static boolean checkIfSeated(Person person) {
 		if (person.location.equals(person.seatLocation)) {
-			person.state = State.SEATED;
+			person.state = PersonState.SEATED;
 			return true;
 		}
 		return false;
@@ -289,13 +296,14 @@ public class CS2420_Semester_Project {
 
 	public static boolean checkIfAllSeated() {
 		for (Person person : peopleArr) {
-			if (person.state != State.SEATED) {
+			if (person.state != PersonState.SEATED) {
 				return false;
 			} else {
-				continue;
-			}
+				break;
+            }
 		}
-		paused = true;
+		if (!load_complete) paused = true;
+		load_complete = true;
 		return true;
 	}
 
@@ -318,37 +326,45 @@ public class CS2420_Semester_Project {
 				}
 				break;
 			case KeyEvent.VK_W:
-				for (int i = 0; i < peopleArr.size(); i++) {
-					peopleArr.get(i).moveY(-PERSON_STEP_Y);
+				for (Person person : peopleArr) {
+					person.moveY(-PERSON_STEP_Y);
 				}
 				break;
 			case KeyEvent.VK_A:
-				for (int i = 0; i < peopleArr.size(); i++) {
-					peopleArr.get(i).moveX(-PERSON_STEP_X);
+				for (Person person : peopleArr) {
+					person.moveX(-PERSON_STEP_X);
 				}
 				break;
 			case KeyEvent.VK_S:
-				for (int i = 0; i < peopleArr.size(); i++) {
-					peopleArr.get(i).moveY(PERSON_STEP_Y);
+				for (Person person : peopleArr) {
+					person.moveY(PERSON_STEP_Y);
 				}
 				break;
 			case KeyEvent.VK_D:
-				for (int i = 0; i < peopleArr.size(); i++) {
-					peopleArr.get(i).moveX(PERSON_STEP_X);
+				for (Person person : peopleArr) {
+					person.moveX(PERSON_STEP_X);
 				}
 				break;
 
 			case KeyEvent.VK_COMMA:
-				clockSpeed-=100;
+				if (clockSpeed <= 100) {
+					clockSpeed = 50;
+				} else {
+					clockSpeed-=100;
+				}
 				break;
 			case KeyEvent.VK_PERIOD:
-				clockSpeed+=100;
+				if (clockSpeed == 50) {
+					clockSpeed = 100;
+				} else {
+					clockSpeed+=100;
+				}
 				break;
 
 			case KeyEvent.VK_K:
 				allow_queuing();
-				queueMovementToLocation(peopleArr.get(0), new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
-				queueMovementToLocation(peopleArr.get(0), new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
+				queueMovementToLocation(peopleArr.getFirst(), new Location(PLANE_GRID_1_X, PLANE_GRID_1_Y-PERSON_STEP_Y));
+				queueMovementToLocation(peopleArr.getFirst(), new Location(PLANE_GRID_2_X, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_J:
 				allow_queuing();
@@ -366,7 +382,7 @@ public class CS2420_Semester_Project {
 				moveAllToLocation(new Location(PLANE_GRID_2_X+PERSON_STEP_X*3, PLANE_GRID_2_Y-PERSON_STEP_Y));
 				break;
 			case KeyEvent.VK_P:
-				paused = (paused) ? false : true;
+				paused = !paused;
 				break;
 			case KeyEvent.VK_Y:
 				moveAllToSeats(peopleArr);
@@ -380,7 +396,7 @@ public class CS2420_Semester_Project {
 				moveAllToSeats(peopleArr);
 				break;
 			case KeyEvent.VK_3:
-				unloading = (unloading) ? false : true;
+				unloading = !unloading;
 				paused = false;
 				break;
 			case KeyEvent.VK_4:
@@ -443,6 +459,7 @@ public class CS2420_Semester_Project {
 	}
 	private static void reset() {
 		unloading = false;
+		load_complete = false;
 		display_clock = Display_Clock.STOPPED;
 		tickClock.setText("0");
 		ticks = 0;
@@ -476,11 +493,10 @@ public class CS2420_Semester_Project {
 			boolean second_line_checker = false;
 			while ((line = reader.readLine()) != null) {
 				if (second_line_checker) addToArr(result, line);
-				second_line_checker = (second_line_checker) ? false : true;
+				second_line_checker = !second_line_checker;
 			}
-		} catch (IOException e) {
+		} catch (IOException _) {
 			System.out.println("Config file not found in src/CS2420_Semester_Project directory");
-			e.printStackTrace();
 		}
 
 		// Malleable part vvv
@@ -490,46 +506,14 @@ public class CS2420_Semester_Project {
 		clockSpeed = getIntVal(result, Config_Names.CLOCK_SPEED.getValue());
 	}
 	private static boolean getBoolVal(String[] arr, int placement) {
-		return Boolean.valueOf(arr[placement]);
+		return arr[placement] != null && Boolean.parseBoolean(arr[placement]);
 	}
 	private static int getIntVal(String[] arr, int placement) {
-		return Integer.valueOf(arr[placement]);
+		return (arr[placement] != null) ? Integer.parseInt(arr[placement]) : 0;
 	}
 	private static void addToArr(String[] arr, String value) {
 		for (int i = 0; i < arr.length; i++) {
 			if (arr[i] == null)  { arr[i] = value;	break; }
 		}
 	}
-}
-
-enum Display_Clock {
-	RUNNING,
-	STOPPED
-}
-
-enum Sort_Type {
-	RANDOM(0),
-	BACK_TO_FRONT(1),
-	FRONT_TO_BACK(2),
-	GROUPS_6(3),
-	GROUPS_12(4),
-	GROUPS_18(5);
-
-	private final int value; // Super compact code time!
-    Sort_Type(int value) { this.value = value; }
-    public int getvalue() { return value; }
-	public static Sort_Type fromvalue(int value) {
-		for (Sort_Type s : Sort_Type.values()) {if (s.value == value) return s;}
-		throw new IllegalArgumentException("Invalid code");
-	}
-}
-enum Config_Names {
-	PEOPLE_COLLISION(0),
-	QUEUE_TYPE(1),
-	PEOPLE_AMOUNT(2),
-	CLOCK_SPEED(3);
-
-    private final int value;
-    Config_Names(int value) { this.value = value; }
-    public int getValue() { return value; }
 }
