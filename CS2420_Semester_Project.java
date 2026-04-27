@@ -142,7 +142,7 @@ public class CS2420_Semester_Project {
 					}
 					if (peopleAreMoving()) ticks++;
 
-					System.out.println("tick");
+//					System.out.println("tick");
 					tickClock.setText(String.valueOf(ticks));
 				}
 			}

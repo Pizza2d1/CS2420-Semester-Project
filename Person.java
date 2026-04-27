@@ -161,6 +161,10 @@ public class Person {
         personSprite.setBackground(newColor);
         personSprite.repaint();;
     }
+
+    public int compareTo(Person other) {
+        return Integer.compare(personID, other.personID);
+    }
 }
 
 

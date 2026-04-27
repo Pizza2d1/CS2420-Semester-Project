@@ -2,8 +2,8 @@ package CS2420_Semester_Project;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 
 /**
  *
@@ -19,29 +19,27 @@ public class PassengerQueue<T> {
     }
 
     public static List<Person> backToFront(List<Person> queue) {
-        int[] queueOrder = new int[people_amount];
-        int count=0;
-        for (int i = 29; i >= 0; i--) {
-            for (int j = 1; j <= 3; j++) {
-                queueOrder[count]=(i * 6 + j);
-                count++;
-            }
-            for (int k = 6; k >= 4; k--) {
-                queueOrder[count]=(i * 6 + k);
-                count++;
-            }
+        List<Person> tempGroup = new ArrayList<>();
+        List<Person> new_arr = new ArrayList<>();
+        queue = frontToBack(queue); // resets the order of the peopleArr back to 1,2,3...
+        for (int i = (people_amount/6)-1; i >= 0; i--) {
+            addLeftToRightRows(queue, tempGroup, i);
+            new_arr.addAll(tempGroup);
+            tempGroup.clear();
         }
-        return sortPeopleArr(queue, queueOrder);
+        return new_arr;
     }
 
     public static List<Person> frontToBack(List<Person> queue) {
-        int[] queueOrder = new int[people_amount];
-        for (int i = 0; i < people_amount; i++) {
-            queueOrder[i] = i;
-        }
+        queue.sort(new CustomComparator());
+//        int[] queueOrder = new int[people_amount];
+//        for (int i = 0; i < people_amount; i++) {
+//            queueOrder[i] = i;
+//        }
         // for (int i : queueOrder) System.out.println(i);
         // for (Person person : queue) System.out.println(person.personID);
-        return sortPeopleArr(queue, queueOrder);
+//        return sortPeopleArr(queue, queueOrder);
+        return queue;
     }
 
     /*
@@ -118,30 +116,69 @@ public class PassengerQueue<T> {
 //        }
 //    }
 
+//    private static List<Person> sortPeopleArr(List<Person> queue, int[] queueOrder) {
+//        int[] logx = new int[queue.size()];
+//        List<Person> temp_person_arr = new ArrayList<>();
+//        for (int i = 0; i < queue.size(); i++) {
+//            logx[i] = queue.get(i).personID;
+//        }
+//        int counter = 0;
+//        mainloop:
+//        while (temp_person_arr.size() != queue.size()) {
+//            for (int i = 0; i < logx.length; i++) {
+//                int personValue = logx[i];
+//                if (personValue == counter) {
+//                    counter++;
+//                    temp_person_arr.add(queue.get(i));
+//                    continue mainloop;
+//                }
+//            }
+//        }
+//        for (Person person : queue) {
+//            System.out.println("PERSON ID: " + person.personID);
+//        }
+//        for (Person person : temp_person_arr) {
+//            System.out.println("TEMP ID: " + person.personID);
+//        }
+//        return temp_person_arr;
+//    }
     private static List<Person> sortPeopleArr(List<Person> queue, int[] queueOrder) {
-        int[] logx = new int[queue.size()];
-        List<Person> temp_person_arr = new ArrayList<>();
-        for (int i = 0; i < queue.size(); i++) {
-            logx[i] = queue.get(i).personID;
+        List<Person> newArr = new ArrayList<>();
+        queue = frontToBack(queue);
+        for (int i = 0; i < queueOrder.length; i++) {
+            newArr.add(queue.get(i));
         }
-        int counter = 0;
-        mainloop:
-        while (temp_person_arr.size() != queue.size()) {
-            for (int i = 0; i < logx.length; i++) {
-                int personValue = logx[i];
-                if (personValue == counter) {
-                    counter++;
-                    temp_person_arr.add(queue.get(i));
-                    continue mainloop;
-                }
-            }
-        }
-		// for (Person person : queue) {
-		// 	System.out.println("PERSON ID: " + person.personID);
-		// }
-		// for (Person person : temp_person_arr) {
-		// 	System.out.println("TEMP ID: " + person.personID);
-		// }
-        return temp_person_arr;
+//        int[] logx = new int[queue.size()];
+//        List<Person> temp_person_arr = new ArrayList<>();
+//        for (int i = 0; i < queue.size(); i++) {
+//            logx[i] = queue.get(i).personID;
+//        }
+//        int counter = 0;
+//        mainloop:
+//        while (temp_person_arr.size() != queue.size()) {
+//            for (int i = 0; i < logx.length; i++) {
+//                int personValue = logx[i];
+//                if (personValue == counter) {
+//                    counter++;
+//                    temp_person_arr.add(queue.get(i));
+//                    continue mainloop;
+//                }
+//            }
+//        }
+//		 for (Person person : queue) {
+//		 	System.out.println("PERSON ID: " + person.personID);
+//		 }
+//		 for (Person person : temp_person_arr) {
+//		 	System.out.println("TEMP ID: " + person.personID);
+//		 }
+        for (Person person : newArr) System.out.println(person.personID);
+        return newArr;
+    }
+}
+
+class CustomComparator implements Comparator<Person> {
+    @Override
+    public int compare(Person o1, Person o2) {
+        return o1.compareTo(o2);
     }
 }
