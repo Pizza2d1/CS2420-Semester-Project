@@ -1,7 +1,7 @@
 # People collision
 1
 # Starting queue type (0: RANDOM, 1: BACK_TO_FRONT, 2: FRONT_TO_BACK, 3: GROUPS_OF_6, 4: GROUPS_OF_12, 5: GROUPS_OF_18)
-1
+0
 # People amount
 180
 # Clock speed (ms)

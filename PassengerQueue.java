@@ -11,11 +11,7 @@ import java.util.Random;
  */
 public class PassengerQueue<T> {
 
-<<<<<<< HEAD
-    private static int people_amount = CS2420_Semester_Project.people_amount;
-=======
     private static final int people_amount = CS2420_Semester_Project.people_amount;
->>>>>>> main
 
     public static List<Person> backToFront(List<Person> queue) {
         int[] queueOrder = new int[people_amount];
@@ -56,27 +52,14 @@ public class PassengerQueue<T> {
         List<Person> new_arr = new ArrayList<>();
         queue = frontToBack(queue); // resets the order of the peopleArr back to 1,2,3...
         for (int i = (people_amount/6)-1; i >= 0; i--) {
-<<<<<<< HEAD
-            for (int j = 1; j <= 3; j++) {
-                tempGroup.add(queue.get((i * 6 + j)-1));
-            }
-            for (int k = 6; k >= 4; k--) {
-                tempGroup.add(queue.get((i * 6 + k)-1));
-            }
-            Collections.shuffle(tempGroup); // Simulate the individual groups being random
-            for (Person j : tempGroup) new_arr.add(j);
-=======
             addLeftToRightRows(queue, tempGroup, i);
             Collections.shuffle(tempGroup); // Simulate the individual groups being random
             new_arr.addAll(tempGroup);
->>>>>>> main
             tempGroup.clear();
         }
         return new_arr;
     }
 
-<<<<<<< HEAD
-=======
     private static void addLeftToRightRows(List<Person> queue, List<Person> tempGroup, int i) {
         for (int j = 1; j <= 3; j++) {
             tempGroup.add(queue.get((i * 6 + j)-1));
@@ -86,29 +69,16 @@ public class PassengerQueue<T> {
         }
     }
 
->>>>>>> main
     public static List<Person> groupsOf12(List<Person> queue) {
         List<Person> tempGroup = new ArrayList<>();
         List<Person> new_arr = new ArrayList<>();
         queue = frontToBack(queue); // resets the order of the peopleArr back to 1,2,3...
         int counter = 0;
         for (int i = (people_amount/6)-1; i >= 0; i--) {
-<<<<<<< HEAD
-            for (int j = 1; j <= 3; j++) {
-                tempGroup.add(queue.get((i * 6 + j)-1));
-            }
-            for (int k = 6; k >= 4; k--) {
-                tempGroup.add(queue.get((i * 6 + k)-1));
-            }
-            if (counter == 1) { // diff of below
-                Collections.shuffle(tempGroup); // Simulate the individual groups being random
-                for (Person j : tempGroup) new_arr.add(j);
-=======
             addLeftToRightRows(queue, tempGroup, i);
             if (counter == 1) { // diff of below
                 Collections.shuffle(tempGroup); // Simulate the individual groups being random
                 new_arr.addAll(tempGroup);
->>>>>>> main
                 System.out.println();
                 tempGroup.clear();
                 counter=0;
@@ -125,22 +95,10 @@ public class PassengerQueue<T> {
         queue = frontToBack(queue); // resets the order of the peopleArr back to 1,2,3...
         int counter = 0;
         for (int i = (people_amount/6)-1; i >= 0; i--) {
-<<<<<<< HEAD
-            for (int j = 1; j <= 3; j++) {
-                tempGroup.add(queue.get((i * 6 + j)-1));
-            }
-            for (int k = 6; k >= 4; k--) {
-                tempGroup.add(queue.get((i * 6 + k)-1));
-            }
-            if (counter == 2) { // diff of above
-                Collections.shuffle(tempGroup); // Simulate the individual groups being random
-                for (Person j : tempGroup) new_arr.add(j);
-=======
             addLeftToRightRows(queue, tempGroup, i);
             if (counter == 2) { // diff of above
                 Collections.shuffle(tempGroup); // Simulate the individual groups being random
                 new_arr.addAll(tempGroup);
->>>>>>> main
                 tempGroup.clear();
                 counter=0;
             } else {
@@ -150,15 +108,15 @@ public class PassengerQueue<T> {
         return new_arr;
     }
 
-    static void shuffleArray(int[] ar) {
-        Random rnd = new Random();
-        for (int i = ar.length - 1; i > 0; i--) {
-            int index = rnd.nextInt(i + 1);
-            int a = ar[index];
-            ar[index] = ar[i];
-            ar[i] = a;
-        }
-    }
+//    static void shuffleArray(int[] ar) {
+//        Random rnd = new Random();
+//        for (int i = ar.length - 1; i > 0; i--) {
+//            int index = rnd.nextInt(i + 1);
+//            int a = ar[index];
+//            ar[index] = ar[i];
+//            ar[i] = a;
+//        }
+//    }
 
     private static List<Person> sortPeopleArr(List<Person> queue, int[] queueOrder) {
         int[] logx = new int[queue.size()];
@@ -168,18 +126,10 @@ public class PassengerQueue<T> {
         }
         int counter = 0;
         mainloop:
-<<<<<<< HEAD
-        while (true) {
-            if (temp_person_arr.size() == queue.size()) break;
-            for (int i = 0; i < logx.length; i++) {
-                int personValue = logx[i];
-                if (personValue == counter){
-=======
         while (temp_person_arr.size() != queue.size()) {
             for (int i = 0; i < logx.length; i++) {
                 int personValue = logx[i];
                 if (personValue == counter) {
->>>>>>> main
                     counter++;
                     temp_person_arr.add(queue.get(i));
                     continue mainloop;
@@ -194,13 +144,4 @@ public class PassengerQueue<T> {
 		// }
         return temp_person_arr;
     }
-
-    // private static void syncPeopleArr(List<Person> queue, int[] queueOrder) {
-        // List<Person> new_array = new ArrayList<>();
-        // int[] logx = new int[CS2420_Semester_Project.people_amount];
-        // int[] logy = new int[CS2420_Semester_Project.people_amount];
-        // for (int i : queueOrder) {
-            // new_array.add()
-        // }
-    // }
 }

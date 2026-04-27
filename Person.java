@@ -19,6 +19,7 @@ public class Person {
     // Testing variables
     private static final boolean REPORT_MOVEMENT = false;
     private static final boolean REPORT_COLLISIONS = false;
+    private static final boolean ALLOW_PUSHTHROUGH = false;
 
     // Make sure it follows the person png size
     public static final int PERSON_WIDTH = 10;
@@ -30,16 +31,17 @@ public class Person {
     public static final int PERSON_SPAWN_Y = 50;
 
     public int personID;
-    public boolean isMoving;
+//    public boolean isMoving;
     public JLabel personSprite;
     public List<Location> moveToLocationQueue;
     public PersonState state;
     public Location location;
+    public Location target_location;
     public Location seatLocation = new Location(0, 0);
 
     public Person(int personID, boolean isMoving, JLabel personSprite, Location location, List<Location> moveToLocationQueue, PersonState state) {
         this.personID = personID;
-        this.isMoving = isMoving;
+//        this.isMoving = isMoving;
         this.personSprite = personSprite;
         this.location = location;
         this.moveToLocationQueue = moveToLocationQueue;
@@ -119,34 +121,38 @@ public class Person {
 
     private boolean checkForCollision(List<Person> peopleArr, Location targetLocation) {
         for (Person other_person : peopleArr) {
-            if (this.equals(other_person)) break;
+            if (this.equals(other_person)) continue;
             if (targetLocation.equals(other_person.location)) {
                 if (REPORT_COLLISIONS) {
                     System.out.printf("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n%n",
                     personID, location.x, location.y, other_person.personID, other_person.location.x, other_person.location.y);
                 }
                 setColor(Color.YELLOW);
-<<<<<<< HEAD
-                if (state == State.BLOCKED && other_person.state != State.SEATED) {
-                    if (location.x != targetLocation.x) {
-                        return false; // Force movement if blocked for more than a tick when trying to get into seat
-                    } else {
-                        return true;
+                if (ALLOW_PUSHTHROUGH) {
+                    if (state == PersonState.BLOCKED && other_person.state != PersonState.SEATED) {
+                        return location.x == targetLocation.x; // Force movement if blocked for more than a tick when trying to get into seat
                     }
                 }
-                state = State.BLOCKED;
-=======
-                if (state == PersonState.BLOCKED && other_person.state != PersonState.SEATED) {
-                    return location.x == targetLocation.x; // Force movement if blocked for more than a tick when trying to get into seat
-                }
                 state = PersonState.BLOCKED;
->>>>>>> main
                 return true;
             }
         }
         state = PersonState.MOVING;
         return false;
     }
+//    private boolean checkForCollision(List<Person> peopleArr, Location targetLocation) {
+//        for (Person other_person : peopleArr) {
+//            if (this.equals(other_person)) continue;
+//            if (targetLocation.equals(other_person.location)) {
+//                if (REPORT_COLLISIONS) { System.out.printf("COLLISION:\nPerson %d: %d %d\nPerson %d: %d %d\n\n%n", personID, location.x, location.y, other_person.personID, other_person.location.x, other_person.location.y); }
+//                setColor(Color.YELLOW);
+//                state = PersonState.BLOCKED;
+//                return true;
+//            }
+//        }
+//        state = PersonState.MOVING;
+//        return false;
+//    }
 
     private void updateSprite() {
         personSprite.setLocation(location.x, location.y);

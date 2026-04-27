@@ -2,16 +2,7 @@ package CS2420_Semester_Project;
 
 import java.awt.Color;
 import java.awt.GridLayout;
-<<<<<<< HEAD
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-=======
-import java.io.*;
->>>>>>> main
-import java.util.List;
+import java.io.Serial;
 import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -54,11 +45,7 @@ public class PlaneGui extends JFrame {
 	final static int PLANE_GRID_2_Y = 188;
 
 
-<<<<<<< HEAD
-	public PlaneGui(List<Person> peopleArr, JLabel planeDisplay, JPanel contentPane) {
-=======
 	public PlaneGui(JLabel planeDisplay, JPanel contentPane) {
->>>>>>> main
 		// getSimSettings();
 		// System.out.println(WINDOW_X);
 		// System.out.println(WINDOW_Y);
