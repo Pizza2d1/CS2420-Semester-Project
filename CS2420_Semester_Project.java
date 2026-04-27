@@ -51,8 +51,6 @@ public class CS2420_Semester_Project {
 	static boolean load_complete = false;
 	static boolean paused = false;
 	static int ticks = 0;
-//	static Display_Clock display_clock = Display_Clock.STOPPED;
-//	static List<Integer> queue = new ArrayList<>();
 
 	public static void main(String[] args) {
 
@@ -130,6 +128,7 @@ public class CS2420_Semester_Project {
 			while (true) {
 				long tempTime = System.currentTimeMillis();
 				if (tempTime - startTime > clockSpeed) {
+					updateStats();
 					if (paused) continue;
 					startTime = System.currentTimeMillis();
 
@@ -145,7 +144,6 @@ public class CS2420_Semester_Project {
 
 					System.out.println("tick");
 					tickClock.setText(String.valueOf(ticks));
-					updateStats();
 				}
 			}
 		};
@@ -178,37 +176,37 @@ public class CS2420_Semester_Project {
 		);
 	}
 
-//	private static void moveAllToLocation(Location targetLocation) {
-//		allow_queuing();
-//		paused = false;
-//		Runnable task = () -> {
-//			long startTime = System.currentTimeMillis();
-//			int personCount = 0;
-//			while (true) {
-//				if (display_clock == Display_Clock.STOPPED) break;
-//				long tempTime = System.currentTimeMillis();
-//				if (tempTime - startTime > clockSpeed) {
-//					if (personCount == peopleArr.size()) break;
-//					queueMovementToLocation(peopleArr.get(personCount), targetLocation);
-//					startTime = System.currentTimeMillis();
-//					personCount++;
-//				}
-//			}
-//			Thread.currentThread().interrupt();
-//		};
-//		startThread(task);
-//	}
-
 	private static void moveAllToLocation(Location targetLocation) {
+//		allow_queuing();
 		paused = false;
 		Runnable task = () -> {
-			for (Person person : peopleArr) {
-				queueMovementToLocation(person, targetLocation);
-				sleep(100);
+			long startTime = System.currentTimeMillis();
+			int personCount = 0;
+			while (true) {
+//				if (display_clock == Display_Clock.STOPPED) break;
+				long tempTime = System.currentTimeMillis();
+				if (tempTime - startTime > clockSpeed) {
+					if (personCount == peopleArr.size()) break;
+					queueMovementToLocation(peopleArr.get(personCount), targetLocation);
+					startTime = System.currentTimeMillis();
+					personCount++;
+				}
 			}
+			Thread.currentThread().interrupt();
 		};
 		startThread(task);
 	}
+
+//	private static void moveAllToLocation(Location targetLocation) {
+//		paused = false;
+//		Runnable task = () -> {
+//			for (Person person : peopleArr) {
+//				queueMovementToLocation(person, targetLocation);
+//				sleep(100);
+//			}
+//		};
+//		startThread(task);
+//	}
 
 	private static void moveAllToSeats(List<Person> people) {
 		paused = false;
@@ -312,9 +310,6 @@ public class CS2420_Semester_Project {
 		return true;
 	}
 	private static boolean peopleAreMoving() {
-//		for (Person person : peopleArr) {
-//			if (getPersonIsMoving(person)) return true;
-//		}
 		for (boolean b : peopleMovingTracker) {
 			if (b) return true;
 		}
@@ -480,7 +475,6 @@ public class CS2420_Semester_Project {
 	private static boolean getBoolVal(String[] arr, int placement) {
 		if (arr[placement] == null) return true;
 		return arr[placement].equals("1");
-//		return arr[placement] != null && Boolean.parseBoolean(arr[placement]);
 	}
 	private static int getIntVal(String[] arr, int placement) {
 		return (arr[placement] != null) ? Integer.parseInt(arr[placement]) : 0;

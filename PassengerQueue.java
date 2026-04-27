@@ -13,6 +13,11 @@ public class PassengerQueue<T> {
 
     private static final int people_amount = CS2420_Semester_Project.people_amount;
 
+    public static List<Person> random(List<Person> queue) {
+        Collections.shuffle(queue);
+        return queue;
+    }
+
     public static List<Person> backToFront(List<Person> queue) {
         int[] queueOrder = new int[people_amount];
         int count=0;
@@ -27,11 +32,6 @@ public class PassengerQueue<T> {
             }
         }
         return sortPeopleArr(queue, queueOrder);
-    }
-
-    public static List<Person> random(List<Person> queue) {
-        Collections.shuffle(queue);
-        return queue;
     }
 
     public static List<Person> frontToBack(List<Person> queue) {
