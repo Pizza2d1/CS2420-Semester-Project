@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author Cory
  */
-public class PassengerQueue<T> {
+public class PassengerQueue {
 
     private static final int people_amount = CS2420_Semester_Project.people_amount;
 
@@ -142,12 +142,12 @@ public class PassengerQueue<T> {
 //        }
 //        return temp_person_arr;
 //    }
-    private static List<Person> sortPeopleArr(List<Person> queue, int[] queueOrder) {
-        List<Person> newArr = new ArrayList<>();
-        queue = frontToBack(queue);
-        for (int i = 0; i < queueOrder.length; i++) {
-            newArr.add(queue.get(i));
-        }
+//    private static List<Person> sortPeopleArr(List<Person> queue, int[] queueOrder) {
+//        List<Person> newArr = new ArrayList<>();
+//        queue = frontToBack(queue);
+//        for (int i = 0; i < queueOrder.length; i++) {
+//            newArr.add(queue.get(i));
+//        }
 //        int[] logx = new int[queue.size()];
 //        List<Person> temp_person_arr = new ArrayList<>();
 //        for (int i = 0; i < queue.size(); i++) {
@@ -171,9 +171,9 @@ public class PassengerQueue<T> {
 //		 for (Person person : temp_person_arr) {
 //		 	System.out.println("TEMP ID: " + person.personID);
 //		 }
-        for (Person person : newArr) System.out.println(person.personID);
-        return newArr;
-    }
+//        for (Person person : newArr) System.out.println(person.personID);
+//        return newArr;
+//    }
 }
 
 class CustomComparator implements Comparator<Person> {

@@ -117,7 +117,7 @@ public class CS2420_Semester_Project {
 		personSprite.setBackground(red);
 		personSprite.setLocation(PERSON_SPAWN_X, PERSON_SPAWN_Y);
 		personSprite.setSize(PERSON_WIDTH, PERSON_HEIGHT);
-		Person test = new Person(seatingNumber, false, personSprite, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), new ArrayList<>(), PersonState.MOVING);
+		Person test = new Person(seatingNumber, personSprite, new Location(PERSON_SPAWN_X, PERSON_SPAWN_Y), new ArrayList<>(), PersonState.MOVING);
 		peopleArr.add(test);
 		contentPane.add(test.personSprite);
 	}

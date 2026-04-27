@@ -36,12 +36,10 @@ public class Person {
     public List<Location> moveToLocationQueue;
     public PersonState state;
     public Location location;
-    public Location target_location;
     public Location seatLocation = new Location(0, 0);
 
-    public Person(int personID, boolean isMoving, JLabel personSprite, Location location, List<Location> moveToLocationQueue, PersonState state) {
+    public Person(int personID, JLabel personSprite, Location location, List<Location> moveToLocationQueue, PersonState state) {
         this.personID = personID;
-//        this.isMoving = isMoving;
         this.personSprite = personSprite;
         this.location = location;
         this.moveToLocationQueue = moveToLocationQueue;
@@ -61,9 +59,6 @@ public class Person {
         return (seatingID / 6) * PERSON_STEP_Y + PLANE_GRID_1_Y;
     }
 
-    public int getX() {
-        return location.x;
-    }
     public void setX(int new_x_pos) {
         location.x = new_x_pos;
         updateSprite();
@@ -71,9 +66,6 @@ public class Person {
         // personSprite.setLocation(new_x_pos, getY());
     }
 
-    public int getY() {
-        return location.y;
-    }
     public void setY(int new_y_pos) {
         location.y = new_y_pos;
         updateSprite();
@@ -159,7 +151,7 @@ public class Person {
     }
     public void setColor(Color newColor) {
         personSprite.setBackground(newColor);
-        personSprite.repaint();;
+        personSprite.repaint();
     }
 
     public int compareTo(Person other) {
